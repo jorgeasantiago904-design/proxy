@@ -7,6 +7,10 @@
 <meta name="title" content="macOS Premium Desktop Studio">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style id="__livecodes_styles__">
 *,
 *::before,
@@ -19,22 +23,10 @@
 html,
 body {
   height: 100%;
-  font-family: "San Francisco", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Rajdhani', sans-serif;
   user-select: none;
   overflow: hidden;
   background: transparent !important;
-}
-
-@font-face {
-  font-family: "San Francisco";
-  font-weight: 400;
-  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisregular-webfont.woff");
-}
-
-@font-face {
-  font-family: "San Francisco";
-  font-weight: 800;
-  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisbold-webfont.woff");
 }
 
 /* --- Wallpaper & Video Layer --- */
@@ -72,7 +64,7 @@ body {
   pointer-events: none;
 }
 
-/* --- Premium Glass Window Manager --- */
+/* --- Solid Black Window Manager --- */
 .app-window {
   position: fixed;
   top: 10%;
@@ -83,12 +75,10 @@ body {
   min-width: 350px;
   min-height: 250px;
   resize: both;
-  background: rgba(30, 30, 30, 0.45);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #000000;
+  border: 1px solid #222222;
   border-radius: 12px;
-  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.8);
   z-index: 5000;
   display: flex;
   flex-direction: column;
@@ -119,7 +109,7 @@ body {
   display: flex;
   align-items: center;
   position: relative;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid #222222;
   padding: 0 16px;
   cursor: move;
   flex-shrink: 0;
@@ -146,14 +136,14 @@ body {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: #eeeeee;
 }
 
 .window-body {
   flex: 1;
-  background: #15191e;
+  background: #111111;
   overflow: hidden;
   position: relative;
 }
@@ -176,7 +166,154 @@ body {
   display: none;
 }
 
-/* --- Premium Glass Dock Base Layout --- */
+/* --- Finder Panel (Solid) --- */
+.desktop-viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 7999;
+  display: none;
+}
+
+.finder-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: 560px;
+  height: 580px;
+  background: #000000;
+  border: 1px solid #222222;
+  border-radius: 16px;
+  display: none;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-direction: column;
+  padding: 30px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+  z-index: 8000;
+  color: #fff;
+}
+
+.finder-panel.open {
+  display: flex;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
+.search-container input {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  padding: 12px 15px 12px 45px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-container input:focus {
+  border-color: #444444;
+  background: #111111;
+}
+
+.search-container i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.section-title {
+  font-size: 14px;
+  color: #aaaaaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.pinned-apps-layout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.pinned-app-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid transparent;
+}
+
+.pinned-app-card:hover {
+  background: #0a0a0a;
+  border-color: #222222;
+}
+
+.pinned-app-card img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  object-fit: cover;
+}
+
+.pinned-app-card span {
+  font-size: 14px;
+  color: #dddddd;
+  text-align: center;
+  font-weight: 600;
+}
+
+.start-panel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #222222;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cccccc;
+  border: 1px solid #222222;
+}
+
+.profile-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #cccccc;
+}
+
+/* --- Solid Dock Base Layout --- */
 .dock {
   position: absolute;
   display: flex;
@@ -191,11 +328,9 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(45px) saturate(210%);
-  -webkit-backdrop-filter: blur(45px) saturate(210%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  background: #000000;
+  border: 1px solid #222222;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
   overflow: visible !important;
 }
 
@@ -230,23 +365,20 @@ body {
   pointer-events: none;
 }
 
-/* --- Tooltip Labels --- */
+/* --- Tooltip Labels (Solid) --- */
 .dock-container .name {
   position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: #000000;
+  border: 1px solid #222222;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
   padding: 6px 12px;
-  font-size: 11px;
+  font-size: 13px;
   white-space: nowrap;
   border-radius: 6px;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
   transition: opacity 0.15s ease, visibility 0.15s ease;
   z-index: 20;
 }
@@ -281,37 +413,35 @@ body.dock-right .dock-container li:hover:not(.dragging) { margin: 12px 0; }
 body.dock-right .dock-container .name { right: calc(var(--dock-size, 50px) + 20px); top: 50%; transform: translateY(-50%); }
 
 .dock-separator {
-  background: rgba(255, 255, 255, 0.35);
+  background: #222222;
   border-radius: 2px;
   flex-shrink: 0;
 }
 
 body.dock-bottom .dock-separator,
 body.dock-top .dock-separator {
-  width: 1.5px;
+  width: 2px;
   height: calc(var(--dock-size, 50px) - 10px);
   margin: 0 12px;
 }
 
 body.dock-left .dock-separator,
 body.dock-right .dock-separator {
-  height: 1.5px;
+  height: 2px;
   width: calc(var(--dock-size, 50px) - 10px);
   margin: 12px 0;
 }
 
 .dock-container .ico-bin { width: 90% !important; height: 90% !important; object-fit: contain; }
 
-/* --- Premium Glass Context Menu --- */
+/* --- Solid Context Menu --- */
 .context-menu {
   position: fixed;
   display: none;
   width: 190px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255,255,255,0.25);
+  background: #000000;
+  border: 1px solid #222222;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
   border-radius: 10px;
   padding: 5px;
   z-index: 99999;
@@ -320,7 +450,7 @@ body.dock-right .dock-separator {
 .context-menu-item {
   color: #fff;
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   border-radius: 5px;
   display: flex;
@@ -329,10 +459,10 @@ body.dock-right .dock-separator {
   transition: background 0.15s;
 }
 
-.context-menu-item:hover { background: rgba(255, 255, 255, 0.25); }
-.context-menu-separator { height: 1px; background: rgba(255, 255, 255, 0.15); margin: 4px 0; }
+.context-menu-item:hover { background: #111111; }
+.context-menu-separator { height: 1px; background: #222222; margin: 4px 0; }
 
-/* --- Ultimate Settings Glass Pane --- */
+/* --- Solid Settings Window --- */
 .settings-window {
   position: fixed;
   top: 15%;
@@ -342,12 +472,10 @@ body.dock-right .dock-separator {
   min-width: 300px;
   min-height: 250px;
   resize: both;
-  background: rgba(45, 45, 45, 0.35);
-  backdrop-filter: blur(55px) saturate(230%);
-  -webkit-backdrop-filter: blur(55px) saturate(230%);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: #000000;
+  border: 1px solid #222222;
   border-radius: 14px;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
   z-index: 10000;
   color: white;
   opacity: 0;
@@ -359,40 +487,38 @@ body.dock-right .dock-separator {
 }
 
 .settings-window.open { opacity: 1; pointer-events: auto; transform: scale(1); }
-.settings-header { height: 42px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.18); flex-shrink: 0; }
+.settings-header { height: 42px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #222222; flex-shrink: 0; }
 .settings-header .traffic-lights { position: absolute; left: 16px; top: 14px; }
-.settings-title { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.settings-title { font-size: 15px; font-weight: 600; color: #eeeeee; }
 .settings-content { padding: 20px; flex: 1; overflow-y: auto; }
-.settings-section-title { font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.55); margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+.settings-section-title { font-size: 12px; font-weight: 700; color: #aaaaaa; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
 .settings-section-title:first-child { margin-top: 0; }
 
 .control-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a0a0a;
+  border: 1px solid #222222;
   padding: 12px 14px;
   border-radius: 8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-.control-row label { font-size: 13px; color: rgba(255, 255, 255, 0.95); }
+.control-row label { font-size: 14px; color: #eeeeee; }
 .control-row input[type="range"] { accent-color: #007aff; cursor: pointer; width: 160px; }
 
 .mac-select {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #111111;
+  border: 1px solid #222222;
   color: white;
   padding: 5px 10px;
   border-radius: 6px;
   outline: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
+  font-family: 'Rajdhani', sans-serif;
 }
-.mac-select option { background: #222; color: white; }
+.mac-select option { background: #000000; color: white; }
 
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -400,8 +526,8 @@ body.dock-right .dock-separator {
   position: absolute;
   cursor: pointer;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: #111111;
+  border: 1px solid #222222;
   transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 24px;
 }
@@ -412,10 +538,10 @@ body.dock-right .dock-separator {
   width: 18px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: #ffffff;
   transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 input:checked + .slider { background-color: #34c759; border-color: #248a3d; }
 input:checked + .slider:before { transform: translateX(20px); }
@@ -424,10 +550,8 @@ input:checked + .slider:before { transform: translateX(20px); }
   max-height: 180px;
   overflow-y: auto;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #0a0a0a;
+  border: 1px solid #222222;
   padding: 8px;
   margin-bottom: 12px;
 }
@@ -439,47 +563,43 @@ input:checked + .slider:before { transform: translateX(20px); }
   height: 85px;
   border-radius: 8px;
   cursor: pointer;
-  border: 2px solid transparent;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #222222;
+  background: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.wallpaper-thumb:hover { border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.15); }
-.wallpaper-thumb.active { border-color: #007aff; box-shadow: 0 0 12px rgba(0, 122, 255, 0.65); }
+.wallpaper-thumb:hover { border-color: #444444; background: #111111; }
+.wallpaper-thumb.active { border-color: #007aff; }
 .wallpaper-thumb img,
 .wallpaper-thumb video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
-.status-label { grid-column: span 2; font-size: 12px; color: rgba(255, 255, 255, 0.6); text-align: center; padding: 20px 0; }
+.status-label { grid-column: span 2; font-size: 13px; color: #aaaaaa; text-align: center; padding: 20px 0; }
 
 .mac-btn {
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #111111;
+  border: 1px solid #222222;
   color: white;
   padding: 6px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
+  font-family: 'Rajdhani', sans-serif;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s;
 }
-.mac-btn:hover { background: rgba(255, 255, 255, 0.32); border-color: rgba(255, 255, 255, 0.45); }
+.mac-btn:hover { background: #1a1a1a; border-color: #333333; }
 #localVideoInput { display: none; }
 
 .wallpaper-grid-wrapper::-webkit-scrollbar,
 .settings-content::-webkit-scrollbar { width: 6px; }
 .wallpaper-grid-wrapper::-webkit-scrollbar-thumb,
-.settings-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); border-radius: 10px; }
+.settings-content::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
 
-/* Floating Dragged Apps Style with Grid Snapping Properties */
+/* Floating Dragged Apps Style */
 .desktop-floating-icon {
   position: fixed !important;
   z-index: 1000;
@@ -500,12 +620,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .desktop-floating-icon .name {
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 4px;
-  background: rgba(0, 0, 0, 0.45);
+  background: #000000;
+  border: 1px solid #222222;
   padding: 2px 6px;
   border-radius: 4px;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.8);
   pointer-events: none;
 }
 </style>
@@ -516,6 +636,24 @@ input:checked + .slider:before { transform: translateX(20px); }
 <video id="bgVideo" autoplay muted loop playsinline></video>
 <canvas id="bgEffectsCanvas"></canvas>
 
+<div class="desktop-viewport" id="finder-viewport" onclick="closeFinderMenu()"></div>
+<aside id="finder-menu" class="finder-panel" aria-label="Finder Applications">
+  <div class="search-container">
+    <i class="fas fa-search" aria-hidden="true"></i>
+    <input type="text" id="menu-search" placeholder="Search applications..." onkeyup="filterApps(this.value)" aria-label="Search apps">
+  </div>
+  
+  <div class="section-title">Finder // Applications</div>
+  
+  <div class="pinned-apps-layout" id="pinned-apps-layout"></div>
+  
+  <footer class="start-panel-footer">
+    <div class="profile-section">
+      <div class="profile-avatar"><i class="fas fa-folder" aria-hidden="true"></i></div>
+      <span class="profile-name">Finder Workspace</span>
+    </div>
+  </footer>
+</aside>
 <div id="imessageWindow" class="app-window">
   <div class="window-header">
     <div class="traffic-lights">
@@ -665,6 +803,61 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <script>
+// --- Finder Menu Setup ---
+const APPS = {
+  'cine': {title: 'CINE // HUB', icon: 'https://cdn.worldvectorlogo.com/logos/netflix-logo-icon.svg', pinned: true},
+  'music': {title: 'Spotify', icon: 'https://cdn.pixabay.com/photo/2016/10/22/00/15/spotify-1759471_1280.jpg', pinned: true},
+  'games': {title: 'PS5 Emu', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-OeL_be7RFaoHi3PswkuAR5XcMgBNRDynsg&s', pinned: true},
+  'browser': {title: 'Cine-Web', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeD89ZcX5W1FBtal7RerasT27q-OmZqnBixQ&s', pinned: true},
+  'settings': {title: 'CONFIG', icon: 'https://cdn-icons-png.flaticon.com/512/3938/3938403.png', pinned: true}
+};
+
+function buildInterface() {
+  const startGrid = document.getElementById('pinned-apps-layout');
+  startGrid.innerHTML = '';
+  for (let key in APPS) {
+    let app = APPS[key];
+    if (app.pinned) {
+      let sItem = document.createElement('div');
+      sItem.className = 'pinned-app-card';
+      sItem.onclick = () => { launchApp(app.title); };
+      sItem.innerHTML = `<img src="${app.icon}" alt="${app.title}"><span>${app.title}</span>`;
+      startGrid.appendChild(sItem);
+    }
+  }
+}
+
+function launchApp(name) {
+  alert(`Launching Application: ${name}`);
+}
+
+function openFinderMenu() {
+  let fm = document.getElementById('finder-menu');
+  let vp = document.getElementById('finder-viewport');
+  fm.style.display = 'flex';
+  vp.style.display = 'block';
+  setTimeout(() => fm.classList.add('open'), 10);
+}
+
+function closeFinderMenu() {
+  let fm = document.getElementById('finder-menu');
+  let vp = document.getElementById('finder-viewport');
+  fm.classList.remove('open');
+  setTimeout(() => {
+    fm.style.display = 'none';
+    vp.style.display = 'none';
+  }, 300);
+}
+
+function filterApps(val) {
+  let cards = document.querySelectorAll('.pinned-app-card');
+  cards.forEach(card => {
+    let name = card.querySelector('span').innerText.toLowerCase();
+    card.style.display = name.includes(val.toLowerCase()) ? 'flex' : 'none';
+  });
+}
+// --- /Finder Menu Setup ---
+
 // Frame Security Logic
 (function injectDynamicAppFrames() {
   const secureFrames = {
@@ -778,8 +971,6 @@ async function fetchWallpapersFromSource(sourceUrl = defaultWallpaperSource) {
     throw new Error("Unsupported format.");
   } catch (error) { console.warn(error); throw error; }
 }
-
-
 
 // --- Double Click and Hold Setup ---
 let activeDraggedItem = null;
@@ -921,6 +1112,9 @@ function handleAppLaunch(element) {
     imessageWindow.classList.add("open");
   } else if (appType === "sontube") {
     sontubeWindow.classList.add("open");
+  } else if (appType === "finder") {
+    // --- Hooked up Finder menu trigger here ---
+    openFinderMenu();
   }
 }
 
@@ -1110,6 +1304,7 @@ setupDragAndDrop();
 resPCan();
 updP();
 fetchAllWallpapers();
+buildInterface(); // Build the Finder layout behind the scenes on load
 </script>
 </body>
 </html>
