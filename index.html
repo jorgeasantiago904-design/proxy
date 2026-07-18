@@ -661,7 +661,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">iMessage</div>
+    <div class="window-title">sonflix</div>
   </div>
   <div class="window-body" id="imessageBodyContainer">
     <div class="resize-overlay"></div>
@@ -773,8 +773,8 @@ input:checked + .slider:before { transform: translateX(20px); }
       <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Notes">
     </li>
    <li class="li-8" id="imessageDockIcon" data-app="imessage">
-      <div class="name">Messages</div>
-      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853a55558a68e192ee08_messages.png" alt="Messages">
+      <div class="name">sonflix</div>
+      <img class="ico" src="https://cdn3d.iconscout.com/3d/free/thumb/free-netflix-3d-icon-png-download-13902867.png" alt="Messages">
     </li>
     <li class="li-y" id="sontubeDockIcon" data-app="sontube">
       <div class="name">youtube</div>
@@ -789,7 +789,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="App Store">
     </li>
     <li class="li-14" id="safariDockIcon" data-app="safari">
-      <div class="name">Safari</div>
+      <div class="name">brower</div>
       <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853ddd826358438eda6d_safari.png" alt="Safari">
     </li>
     
@@ -805,11 +805,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 // --- Finder Menu Setup ---
 const APPS = {
-  'cine': {title: 'CINE // HUB', icon: 'https://cdn.worldvectorlogo.com/logos/netflix-logo-icon.svg', pinned: true},
-  'music': {title: 'Spotify', icon: 'https://cdn.pixabay.com/photo/2016/10/22/00/15/spotify-1759471_1280.jpg', pinned: true},
-  'games': {title: 'PS5 Emu', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-OeL_be7RFaoHi3PswkuAR5XcMgBNRDynsg&s', pinned: true},
-  'browser': {title: 'Cine-Web', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeD89ZcX5W1FBtal7RerasT27q-OmZqnBixQ&s', pinned: true},
-  'settings': {title: 'CONFIG', icon: 'https://cdn-icons-png.flaticon.com/512/3938/3938403.png', pinned: true}
+ 
 };
 
 function buildInterface() {
@@ -861,7 +857,7 @@ function filterApps(val) {
 // Frame Security Logic
 (function injectDynamicAppFrames() {
   const secureFrames = {
-    imessage: "https://sturdy-eureka-v65qp94gj66gcww47-8080.app.github.dev/",
+    imessage: "https://nfle.netlify.app/",
     // Updated setup to run standard embed URL direct without standard secure layout restrictions
     sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html"
   };
