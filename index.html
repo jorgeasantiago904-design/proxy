@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>window.livecodes = window.livecodes || {};</script>
+<link class="js-site-favicon" rel="icon" type="image/jpg" href="https://upload.wikimedia.org/wikipedia/commons/8/86/IOS_15_logo.svg">
+<title>macOS Premium Desktop Studio</title>
+<meta name="title" content="macOS Premium Desktop Studio">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style id="__livecodes_styles__">
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: "San Francisco", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  overflow: hidden;
+  background: transparent !important;
+}
+
+@font-face {
+  font-family: "San Francisco";
+  font-weight: 400;
+  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisregular-webfont.woff");
+}
+
+@font-face {
+  font-family: "San Francisco";
+  font-weight: 800;
+  src: url("https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisbold-webfont.woff");
+}
+
+/* --- Wallpaper & Video Layer --- */
+.bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.5s ease;
+}
+
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  object-fit: cover;
+  display: none;
+}
+
+#bgEffectsCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* --- Premium Glass Window Manager --- */
+.app-window {
+  position: fixed;
+  top: 10%;
+  left: calc(50vw - 475px);
+  transform: scale(0.9);
+  width: 950px;
+  height: 650px;
+  min-width: 350px;
+  min-height: 250px;
+  resize: both;
+  background: rgba(30, 30, 30, 0.45);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-window.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.app-window.maximized, .settings-window.maximized {
+  width: 100vw !important;
+  height: 100vh !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: scale(1) !important;
+  border-radius: 0 !important;
+  resize: none !important;
+}
+
+.window-header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0 16px;
+  cursor: move;
+  flex-shrink: 0;
+}
+
+.traffic-lights {
+  display: flex;
+  gap: 8px;
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.light:active { transform: scale(0.9); }
+.light.close { background: #ff5f56; }
+.light.minimize { background: #ffbd2e; }
+.light.maximize { background: #27c93f; }
+
+.window-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.window-body {
+  flex: 1;
+  background: #15191e;
+  overflow: hidden;
+  position: relative;
+}
+
+.window-body iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* Overlay to allow smooth resizing without iframe focus stealing */
+.resize-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: none;
+}
+
+/* --- Premium Glass Dock Base Layout --- */
+.dock {
+  position: absolute;
+  display: flex;
+  z-index: 10;
+  overflow: visible !important;
+  transition: bottom 0.3s, left 0.3s, right 0.3s, top 0.3s, transform 0.3s;
+}
+
+.dock-container {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(45px) saturate(210%);
+  -webkit-backdrop-filter: blur(45px) saturate(210%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  overflow: visible !important;
+}
+
+.dock-container li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dock-size, 50px);
+  height: var(--dock-size, 50px);
+  transition: margin 0.2s ease, width 0.2s, height 0.2s, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: grab;
+  position: relative;
+  overflow: visible !important;
+  will-change: transform;
+}
+
+.dock-container li.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+  z-index: 99999;
+  position: fixed !important;
+  pointer-events: none;
+  transform: scale(1.3) !important;
+}
+
+.dock-container .ico {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: inline-block;
+  pointer-events: none;
+}
+
+/* --- Tooltip Labels --- */
+.dock-container .name {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  padding: 6px 12px;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 6px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  z-index: 20;
+}
+
+.dock-container li:hover .name {
+  visibility: visible;
+  opacity: 1;
+}
+
+body.dock-bottom .dock { bottom: 15px; left: 50%; transform: translateX(-50%); height: calc(var(--dock-size, 50px) + 10px); justify-content: center; }
+body.dock-bottom .dock-container { flex-direction: row; }
+body.dock-bottom .dock-container li:not(.dragging) { transform-origin: 50% 100%; }
+body.dock-bottom .dock-container li:hover:not(.dragging) { margin: 0 12px; }
+body.dock-bottom .dock-container .name { top: -45px; left: 50%; transform: translateX(-50%); }
+
+body.dock-top .dock { top: 15px; left: 50%; transform: translateX(-50%); height: calc(var(--dock-size, 50px) + 10px); justify-content: center; }
+body.dock-top .dock-container { flex-direction: row; }
+body.dock-top .dock-container li:not(.dragging) { transform-origin: 50% 0%; }
+body.dock-top .dock-container li:hover:not(.dragging) { margin: 0 12px; }
+body.dock-top .dock-container .name { bottom: -45px; left: 50%; transform: translateX(-50%); }
+
+body.dock-left .dock { left: 15px; top: 50%; transform: translateY(-50%); width: calc(var(--dock-size, 50px) + 10px); justify-content: center; align-items: center; }
+body.dock-left .dock-container { flex-direction: column; border-radius: 20px; }
+body.dock-left .dock-container li:not(.dragging) { transform-origin: 0% 50%; }
+body.dock-left .dock-container li:hover:not(.dragging) { margin: 12px 0; }
+body.dock-left .dock-container .name { left: calc(var(--dock-size, 50px) + 20px); top: 50%; transform: translateY(-50%); }
+
+body.dock-right .dock { right: 15px; top: 50%; transform: translateY(-50%); width: calc(var(--dock-size, 50px) + 10px); justify-content: center; align-items: center; }
+body.dock-right .dock-container { flex-direction: column; border-radius: 20px; }
+body.dock-right .dock-container li:not(.dragging) { transform-origin: 100% 50%; }
+body.dock-right .dock-container li:hover:not(.dragging) { margin: 12px 0; }
+body.dock-right .dock-container .name { right: calc(var(--dock-size, 50px) + 20px); top: 50%; transform: translateY(-50%); }
+
+.dock-separator {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+body.dock-bottom .dock-separator,
+body.dock-top .dock-separator {
+  width: 1.5px;
+  height: calc(var(--dock-size, 50px) - 10px);
+  margin: 0 12px;
+}
+
+body.dock-left .dock-separator,
+body.dock-right .dock-separator {
+  height: 1.5px;
+  width: calc(var(--dock-size, 50px) - 10px);
+  margin: 12px 0;
+}
+
+.dock-container .ico-bin { width: 90% !important; height: 90% !important; object-fit: contain; }
+
+/* --- Premium Glass Context Menu --- */
+.context-menu {
+  position: fixed;
+  display: none;
+  width: 190px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 5px;
+  z-index: 99999;
+}
+
+.context-menu-item {
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.context-menu-item:hover { background: rgba(255, 255, 255, 0.25); }
+.context-menu-separator { height: 1px; background: rgba(255, 255, 255, 0.15); margin: 4px 0; }
+
+/* --- Ultimate Settings Glass Pane --- */
+.settings-window {
+  position: fixed;
+  top: 15%;
+  left: calc(50vw - 220px);
+  transform: scale(0.9);
+  width: 440px;
+  min-width: 300px;
+  min-height: 250px;
+  resize: both;
+  background: rgba(45, 45, 45, 0.35);
+  backdrop-filter: blur(55px) saturate(230%);
+  -webkit-backdrop-filter: blur(55px) saturate(230%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  z-index: 10000;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-window.open { opacity: 1; pointer-events: auto; transform: scale(1); }
+.settings-header { height: 42px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.18); flex-shrink: 0; }
+.settings-header .traffic-lights { position: absolute; left: 16px; top: 14px; }
+.settings-title { font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.95); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.settings-content { padding: 20px; flex: 1; overflow-y: auto; }
+.settings-section-title { font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.55); margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+.settings-section-title:first-child { margin-top: 0; }
+
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 14px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.control-row label { font-size: 13px; color: rgba(255, 255, 255, 0.95); }
+.control-row input[type="range"] { accent-color: #007aff; cursor: pointer; width: 160px; }
+
+.mac-select {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+.mac-select option { background: #222; color: white; }
+
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+input:checked + .slider { background-color: #34c759; border-color: #248a3d; }
+input:checked + .slider:before { transform: translateX(20px); }
+
+.wallpaper-grid-wrapper {
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px;
+  margin-bottom: 12px;
+}
+
+.wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+.wallpaper-thumb {
+  position: relative;
+  height: 85px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.wallpaper-thumb:hover { border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.15); }
+.wallpaper-thumb.active { border-color: #007aff; box-shadow: 0 0 12px rgba(0, 122, 255, 0.65); }
+.wallpaper-thumb img,
+.wallpaper-thumb video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+
+.status-label { grid-column: span 2; font-size: 12px; color: rgba(255, 255, 255, 0.6); text-align: center; padding: 20px 0; }
+
+.mac-btn {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.mac-btn:hover { background: rgba(255, 255, 255, 0.32); border-color: rgba(255, 255, 255, 0.45); }
+#localVideoInput { display: none; }
+
+.wallpaper-grid-wrapper::-webkit-scrollbar,
+.settings-content::-webkit-scrollbar { width: 6px; }
+.wallpaper-grid-wrapper::-webkit-scrollbar-thumb,
+.settings-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); border-radius: 10px; }
+
+/* Floating Dragged Apps Style with Grid Snapping Properties */
+.desktop-floating-icon {
+  position: fixed !important;
+  z-index: 1000;
+  cursor: grab;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 75px;
+  height: 75px;
+}
+.desktop-floating-icon .ico {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.desktop-floating-icon .name {
+  color: #fff;
+  font-size: 11px;
+  margin-top: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+</style>
+</head>
+<body class="dock-bottom">
+
+<div class="bg-container" id="bgContainer"></div>
+<video id="bgVideo" autoplay muted loop playsinline></video>
+<canvas id="bgEffectsCanvas"></canvas>
+
+<div id="imessageWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeImessageBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">iMessage</div>
+  </div>
+  <div class="window-body" id="imessageBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="sontubeWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeSontubeBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">SonTube</div>
+  </div>
+  <div class="window-body" id="sontubeBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="contextMenu" class="context-menu">
+  <div class="context-menu-item" id="openSettingsBtn">
+    <span>Dock Preferences...</span>
+    <span>⚙️</span>
+  </div>
+  <div class="context-menu-separator"></div>
+  <div class="context-menu-item position-trigger" data-pos="bottom"><span>Position: Bottom</span></div>
+  <div class="context-menu-item position-trigger" data-pos="top"><span>Position: Top</span></div>
+  <div class="context-menu-item position-trigger" data-pos="left"><span>Position: Left</span></div>
+  <div class="context-menu-item position-trigger" data-pos="right"><span>Position: Right</span></div>
+</div>
+
+<div id="settingsWindow" class="settings-window">
+  <div class="settings-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeSettingsBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="settings-title">Desktop Settings</div>
+  </div>
+  <div class="settings-content">
+    <div class="settings-section-title">App Interface Size</div>
+    <div class="control-row" style="margin-bottom: 12px;">
+      <label for="sizeSlider">Icon Dimensions</label>
+      <input type="range" id="sizeSlider" min="40" max="85" value="50">
+    </div>
+
+    <div class="settings-section-title">Screen Position</div>
+    <div class="control-row" style="margin-bottom: 12px;">
+      <label for="positionSelect">Dock Position</label>
+      <select id="positionSelect" class="mac-select">
+        <option value="bottom">Bottom</option>
+        <option value="top">Top</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+      </select>
+    </div>
+
+    <div class="settings-section-title">Video Behavior</div>
+    <div class="control-row" style="margin-bottom: 12px;">
+      <label for="loopToggle">Loop Desktop Video</label>
+      <label class="switch">
+        <input type="checkbox" id="loopToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <input type="hidden" id="wallpaperSourceInput" value="">
+    <button id="loadSourceBtn" style="display: none;"></button>
+
+    <div class="settings-section-title">Live Repository Wallpapers</div>
+    <div class="wallpaper-grid-wrapper">
+      <div class="wallpaper-grid" id="wallpaperGrid">
+        <div class="status-label" id="statusLabel">Scanning GitHub Repository...</div>
+      </div>
+    </div>
+
+    <div class="settings-section-title">Background Effects</div>
+    <div class="control-row" style="margin-bottom: 12px; gap: 8px;">
+      <label for="effectSelect">Background Effect</label>
+      <select id="effectSelect" class="mac-select">
+        <option value="snow" selected>Snow</option>
+        <option value="fireflies">Fireflies</option>
+        <option value="nexus">Nexus / Network</option>
+        <option value="rain">Rain</option>
+        <option value="none">None</option>
+      </select>
+    </div>
+
+    <div class="control-row">
+      <label>Import local media file</label>
+      <div>
+        <button class="mac-btn" id="chooseVideoFileBtn">Choose File</button>
+        <input type="file" id="localVideoInput" accept="video/mp4, image/*">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dock" id="macDock">
+  <div class="dock-container" id="dockContainerList">
+    <li class="li-1 system-protected" id="finderDockIcon" data-app="finder">
+      <div class="name">Finder</div>
+      <img class="ico" src="https://static.wikia.nocookie.net/ipod/images/f/fe/Finder-macOS-Default-1024x1024%402x.png" alt="Finder">
+    </li>
+    <li class="li-5" id="notesDockIcon" data-app="notes">
+      <div class="name">Notes</div>
+      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Notes">
+    </li>
+   <li class="li-8" id="imessageDockIcon" data-app="imessage">
+      <div class="name">Messages</div>
+      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853a55558a68e192ee08_messages.png" alt="Messages">
+    </li>
+    <li class="li-y" id="sontubeDockIcon" data-app="sontube">
+      <div class="name">youtube</div>
+      <img class="ico" src="https://images.icon-icons.com/3053/PNG/512/youtube_macos_bigsur_icon_189528.png" alt="sontube">
+    </li>
+    <li class="li-10" id="musicDockIcon" data-app="music">
+      <div class="name">Music</div>
+      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853ba0782d6ff2aca6b3_music.png" alt="Music">
+    </li>
+    <li class="li-13" id="appstoreDockIcon" data-app="appstore"> 
+      <div class="name">App Store</div>
+      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="App Store">
+    </li>
+    <li class="li-14" id="safariDockIcon" data-app="safari">
+      <div class="name">Safari</div>
+      <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853ddd826358438eda6d_safari.png" alt="Safari">
+    </li>
+    
+    <div class="dock-separator" id="dockSep"></div>
+
+    <li class="li-bin li-15 system-protected" id="binDockIcon" data-app="bin">
+      <div class="name">Bin</div>
+      <img class="ico ico-bin" src="https://images.icon-icons.com/270/PNG/512/Trash_Full_29942.png" alt="Trash Bin">
+    </li>
+  </div>
+</div>
+
+<script>
+// Frame Security Logic
+(function injectDynamicAppFrames() {
+  const secureFrames = {
+    imessage: "https://sturdy-eureka-v65qp94gj66gcww47-8080.app.github.dev/",
+    // Updated setup to run standard embed URL direct without standard secure layout restrictions
+    sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html"
+  };
+  
+  const imsgContainer = document.getElementById("imessageBodyContainer");
+  if (imsgContainer) {
+    const frame = document.createElement("iframe");
+    frame.src = secureFrames.imessage;
+    imsgContainer.appendChild(frame);
+  }
+  
+  const tubeContainer = document.getElementById("sontubeBodyContainer");
+  if (tubeContainer) {
+    const frame = document.createElement("iframe");
+    frame.setAttribute("allowfullscreen", "true");
+    frame.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+    
+    // Grabs the code raw from the CDN and runs it directly in the frame preview
+    fetch(secureFrames.sontube)
+      .then(response => response.text())
+      .then(htmlCode => {
+        frame.srcdoc = htmlCode;
+      })
+      .catch(error => {
+        console.warn("Direct code execution fetch failed, falling back to frame source:", error);
+        frame.src = secureFrames.sontube;
+      });
+      
+    tubeContainer.appendChild(frame);
+  }
+})();
+
+// UI Elements Configuration Map
+const menu = document.getElementById("contextMenu");
+const openSettingsBtn = document.getElementById("openSettingsBtn");
+const settingsWindow = document.getElementById("settingsWindow");
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+const sizeSlider = document.getElementById("sizeSlider");
+const loopToggle = document.getElementById("loopToggle");
+const positionSelect = document.getElementById("positionSelect");
+
+// Window Controllers
+const imessageWindow = document.getElementById("imessageWindow");
+const closeImessageBtn = document.getElementById("closeImessageBtn");
+const sontubeWindow = document.getElementById("sontubeWindow");
+const closeSontubeBtn = document.getElementById("closeSontubeBtn");
+
+// Wallpaper Engine Variables
+const bgContainer = document.getElementById("bgContainer");
+const bgVideo = document.getElementById("bgVideo");
+const wallpaperGrid = document.getElementById("wallpaperGrid");
+const wallpaperSourceInput = document.getElementById("wallpaperSourceInput");
+const loadSourceBtn = document.getElementById("loadSourceBtn");
+const chooseVideoFileBtn = document.getElementById("chooseVideoFileBtn");
+const localVideoInput = document.getElementById("localVideoInput");
+const statusLabel = document.getElementById("statusLabel");
+const bgEffectsCanvas = document.getElementById('bgEffectsCanvas');
+const effectSelect = document.getElementById('effectSelect');
+
+const defaultWallpaperSource = "https://github.com/jorgeasantiago904-design/WALLPAPER-FF";
+let currentWallpaperSource = defaultWallpaperSource;
+
+function setStatus(text) { statusLabel.innerText = text; }
+function isDirectMediaUrl(url) { return /\.(mp4|mov|png|jpe?g|gif|webp)(\?.*)?$/i.test(url); }
+function isGitHubRepoUrl(url) { return /^(https?:\/\/)?(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\/.+)?$/i.test(url); }
+
+function parseGitHubRepoInfo(sourceUrl) {
+  const url = new URL(sourceUrl.startsWith("http") ? sourceUrl : `https://${sourceUrl}`);
+  const pathSegments = url.pathname.replace(/^\/+|\/+$/g, "").split("/");
+  const owner = pathSegments[0];
+  const repo = pathSegments[1];
+  let targetPath = ""; let ref = "";
+  if (pathSegments[2] === "tree" && pathSegments.length >= 4) {
+    ref = pathSegments[3]; targetPath = pathSegments.slice(4).join("/");
+  } else if (pathSegments[2] === "blob" && pathSegments.length >= 4) {
+    const rawPath = pathSegments.slice(3).join("/");
+    return { owner, repo, apiUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${pathSegments[3]}/${rawPath}`, rawPath };
+  }
+  let apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents`;
+  if (targetPath) apiUrl += `/${encodeURIComponent(targetPath)}`;
+  if (ref) apiUrl += `?ref=${encodeURIComponent(ref)}`;
+  return { owner, repo, apiUrl, ref, targetPath };
+}
+
+async function fetchWallpapersFromSource(sourceUrl = defaultWallpaperSource) {
+  const source = sourceUrl?.trim() || defaultWallpaperSource;
+  setStatus(`Loading wallpapers...`);
+  try {
+    if (isDirectMediaUrl(source)) return [{ url: source, type: /\.(mp4|mov)$/i.test(source) ? "video" : "image" }];
+    if (isGitHubRepoUrl(source)) {
+      const repoInfo = parseGitHubRepoInfo(source);
+      const response = await fetch(repoInfo.apiUrl);
+      if (!response.ok) throw new Error(`GitHub request failed: ${response.status}`);
+      const files = await response.json();
+      const fileList = Array.isArray(files) ? files : [files];
+      const supportedExtensions = [".mp4", ".mov", ".png", ".jpg", ".jpeg", ".gif", ".webp"];
+      const validMediaFiles = fileList.filter(file => {
+        const nameLower = file.name.toLowerCase();
+        return supportedExtensions.some(ext => nameLower.endsWith(ext));
+      });
+      if (validMediaFiles.length === 0) throw new Error("No supported media files found.");
+      return validMediaFiles.map(file => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        return { url: `https://cdn.jsdelivr.net/gh/${repoInfo.owner}/${repoInfo.repo}/${file.name}`, type: ['mp4', 'mov'].includes(ext) ? "video" : "image" };
+      });
+    }
+    throw new Error("Unsupported format.");
+  } catch (error) { console.warn(error); throw error; }
+}
+
+
+
+// --- Double Click and Hold Setup ---
+let activeDraggedItem = null;
+let dragOffset = { x: 0, y: 0 };
+let lastClickTime = 0;
+
+function setupDragAndDrop() {
+  document.addEventListener("mousedown", onMouseDown);
+}
+
+function onMouseDown(e) {
+  const targetLI = e.target.closest(".dock-container li, .desktop-floating-icon");
+  if (!targetLI) return;
+
+  // Safeguard logic
+  if (targetLI.classList.contains("system-protected")) {
+    const appType = targetLI.getAttribute("data-app");
+    if (appType === "finder" || appType === "bin") {
+      if (appType === "finder") handleAppLaunch(targetLI);
+      return;
+    }
+  }
+
+  const currentTime = new Date().getTime();
+  const timeDiff = currentTime - lastClickTime;
+
+  if (timeDiff < 350) {
+    e.preventDefault();
+    activeDraggedItem = targetLI;
+    
+    const rect = activeDraggedItem.getBoundingClientRect();
+    dragOffset.x = e.clientX - rect.left;
+    dragOffset.y = e.clientY - rect.top;
+    
+    activeDraggedItem.classList.add("dragging");
+    activeDraggedItem.style.left = `${rect.left}px`;
+    activeDraggedItem.style.top = `${rect.top}px`;
+    
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  } else {
+    handleAppLaunch(targetLI);
+  }
+  lastClickTime = currentTime;
+}
+
+function onMouseMove(e) {
+  if (!activeDraggedItem) return;
+  activeDraggedItem.style.left = `${e.clientX - dragOffset.x}px`;
+  activeDraggedItem.style.top = `${e.clientY - dragOffset.y}px`;
+}
+
+function onMouseUp(e) {
+  if (!activeDraggedItem) return;
+  document.removeEventListener("mousemove", onMouseMove);
+  document.removeEventListener("mouseup", onMouseUp);
+  
+  const bin = document.getElementById("binDockIcon");
+  const binRect = bin.getBoundingClientRect();
+  
+  if (e.clientX >= binRect.left && e.clientX <= binRect.right &&
+      e.clientY >= binRect.top && e.clientY <= binRect.bottom) {
+    activeDraggedItem.remove();
+    activeDraggedItem = null;
+    resetIcons();
+    return;
+  }
+  
+  const dock = document.getElementById("macDock");
+  const dockRect = dock.getBoundingClientRect();
+  
+  if (e.clientX >= dockRect.left && e.clientX <= dockRect.right &&
+      e.clientY >= dockRect.top && e.clientY <= dockRect.bottom) {
+    activeDraggedItem.classList.remove("dragging");
+    activeDraggedItem.className = "";
+    activeDraggedItem.style.position = "";
+    activeDraggedItem.style.left = "";
+    activeDraggedItem.style.top = "";
+    const list = document.getElementById("dockContainerList");
+    const sep = document.getElementById("dockSep");
+    list.insertBefore(activeDraggedItem, sep);
+  } else {
+    activeDraggedItem.classList.remove("dragging");
+    activeDraggedItem.className = "desktop-floating-icon";
+    document.body.appendChild(activeDraggedItem);
+
+    const gridX = Math.round((e.clientX - dragOffset.x) / 85) * 85;
+    const gridY = Math.round((e.clientY - dragOffset.y) / 85) * 85;
+    
+    activeDraggedItem.style.left = `${Math.max(20, Math.min(window.innerWidth - 90, gridX))}px`;
+    activeDraggedItem.style.top = `${Math.max(50, Math.min(window.innerHeight - 120, gridY))}px`;
+  }
+  
+  activeDraggedItem = null;
+  resetIcons();
+}
+
+function resetIcons() { 
+  document.querySelectorAll(".dock-container li").forEach((item) => { item.style.transform = ""; }); 
+}
+
+function focus(index) {
+  resetIcons();
+  const listItems = document.querySelectorAll(".dock-container li");
+  const transformations = [
+    { idx: index - 2, scale: 1.1, offset: -2 },
+    { idx: index - 1, scale: 1.2, offset: -6 },
+    { idx: index, scale: 1.5, offset: -10 },
+    { idx: index + 1, scale: 1.2, offset: -6 },
+    { idx: index + 2, scale: 1.1, offset: -2 }
+  ];
+  transformations.forEach(({ idx, scale, offset }) => {
+    if (listItems[idx] && !listItems[idx].classList.contains("dragging") && listItems[idx].parentNode.id === "dockContainerList") {
+      if (document.body.classList.contains("dock-left")) {
+        listItems[idx].style.transform = `scale(${scale}) translateX(${-offset}px)`;
+      } else if (document.body.classList.contains("dock-right")) {
+        listItems[idx].style.transform = `scale(${scale}) translateX(${offset}px)`;
+      } else if (document.body.classList.contains("dock-top")) {
+        listItems[idx].style.transform = `scale(${scale}) translateY(${-offset}px)`;
+      } else {
+        listItems[idx].style.transform = `scale(${scale}) translateY(${offset}px)`;
+      }
+    }
+  });
+}
+
+document.getElementById("dockContainerList").addEventListener("mouseover", (e) => {
+  const li = e.target.closest("li");
+  if (!li || li.parentNode.id !== "dockContainerList") return;
+  const listItems = Array.from(document.querySelectorAll(".dock-container li"));
+  focus(listItems.indexOf(li));
+});
+document.getElementById("dockContainerList").addEventListener("mouseleave", resetIcons);
+
+// Application Execution Handlers
+function handleAppLaunch(element) {
+  const appType = element.getAttribute("data-app");
+  if (appType === "imessage") {
+    imessageWindow.classList.add("open");
+  } else if (appType === "sontube") {
+    sontubeWindow.classList.add("open");
+  }
+}
+
+closeImessageBtn.addEventListener("click", () => imessageWindow.classList.remove("open"));
+closeSontubeBtn.addEventListener("click", () => sontubeWindow.classList.remove("open"));
+
+// Window Header Logic (Draggable & Screen Boundaries Contrained)
+document.querySelectorAll('.light.minimize').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const win = e.target.closest('.app-window, .settings-window');
+    if(win) win.classList.remove('open');
+  });
+});
+document.querySelectorAll('.light.maximize').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const win = e.target.closest('.app-window, .settings-window');
+    if(win) win.classList.toggle('maximized');
+  });
+});
+
+document.querySelectorAll('.window-header').forEach(header => {
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('light')) return;
+    const win = header.closest('.app-window, .settings-window');
+    if (win.classList.contains('maximized')) return;
+
+    // Show resize overlay inside windows to prevent iframe mouse event loss
+    const overlay = win.querySelector('.resize-overlay');
+    if (overlay) overlay.style.display = 'block';
+
+    let startX = e.clientX; 
+    let startY = e.clientY;
+    let winLeft = win.offsetLeft; 
+    let winTop = win.offsetTop;
+    
+    function moveWin(ev) {
+      let newLeft = winLeft + (ev.clientX - startX);
+      let newTop = winTop + (ev.clientY - startY);
+      
+      // Constrain window bounds to keep inside screen boundaries
+      const rect = win.getBoundingClientRect();
+      if (newLeft < 0) newLeft = 0;
+      if (newTop < 0) newTop = 0;
+      if (newLeft + rect.width > window.innerWidth) newLeft = window.innerWidth - rect.width;
+      if (newTop + rect.height > window.innerHeight) newTop = window.innerHeight - rect.height;
+
+      win.style.left = `${newLeft}px`;
+      win.style.top = `${newTop}px`;
+    }
+    
+    function stopWin() {
+      if (overlay) overlay.style.display = 'none';
+      document.removeEventListener('mousemove', moveWin);
+      document.removeEventListener('mouseup', stopWin);
+    }
+    document.addEventListener('mousemove', moveWin);
+    document.addEventListener('mouseup', stopWin);
+  });
+});
+
+function updateDockPosition(newPosition) {
+  document.body.className = `dock-${newPosition}`;
+  positionSelect.value = newPosition;
+  resetIcons();
+}
+positionSelect.addEventListener("change", (e) => { updateDockPosition(e.target.value); });
+document.querySelectorAll(".position-trigger").forEach(btn => {
+  btn.addEventListener("click", () => { updateDockPosition(btn.getAttribute("data-pos")); });
+});
+
+document.addEventListener("contextmenu", (e) => {
+  e.preventDefault(); menu.style.display = "block";
+  let x = e.clientX; let y = e.clientY;
+  if (x + menu.offsetWidth > window.innerWidth) x = window.innerWidth - menu.offsetWidth - 10;
+  if (y + menu.offsetHeight > window.innerHeight) y = window.innerHeight - menu.offsetHeight - 10;
+  menu.style.left = `${x}px`; menu.style.top = `${y}px`;
+});
+document.addEventListener("click", () => { menu.style.display = "none"; });
+openSettingsBtn.addEventListener("click", (e) => { e.stopPropagation(); settingsWindow.classList.add("open"); });
+closeSettingsBtn.addEventListener("click", () => { settingsWindow.classList.remove("open"); });
+sizeSlider.addEventListener("input", (e) => { document.documentElement.style.setProperty('--dock-size', `${e.target.value}px`); });
+loopToggle.addEventListener("change", (e) => { bgVideo.loop = e.target.checked; });
+
+async function fetchAllWallpapers(sourceUrl) {
+  try {
+    const wallpaperItems = await fetchWallpapersFromSource(sourceUrl || currentWallpaperSource);
+    currentWallpaperSource = sourceUrl || currentWallpaperSource;
+    wallpaperSourceInput.value = currentWallpaperSource;
+    renderWallpaperGrid(wallpaperItems);
+    setStatus(`Loaded ${wallpaperItems.length} wallpaper(s).`);
+  } catch (err) {
+    setStatus("Using default wallpapers.");
+    renderWallpaperGrid(fallbackWallpapers);
+  }
+}
+
+function renderWallpaperGrid(mediaItems) {
+  wallpaperGrid.innerHTML = "";
+  mediaItems.forEach((mediaItem, index) => {
+    const thumbBox = document.createElement("div");
+    thumbBox.className = `wallpaper-thumb ${index === 0 ? 'active' : ''}`;
+    if (mediaItem.type === "video") {
+      const vid = document.createElement("video"); vid.src = mediaItem.url; vid.preload = "metadata"; vid.muted = true; vid.playsInline = true;
+      thumbBox.appendChild(vid);
+    } else {
+      const img = document.createElement("img"); img.src = mediaItem.url;
+      thumbBox.appendChild(img);
+    }
+    thumbBox.addEventListener("click", () => {
+      document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
+      thumbBox.classList.add("active");
+      applyWallpaper(mediaItem);
+    });
+    wallpaperGrid.appendChild(thumbBox);
+    if (index === 0) applyWallpaper(mediaItem);
+  });
+}
+
+function applyWallpaper(item) {
+  if (item.type === "video") {
+    bgContainer.style.backgroundImage = "none"; bgVideo.src = item.url; bgVideo.style.display = "block"; bgVideo.loop = loopToggle.checked; bgVideo.load(); bgVideo.play().catch(() => {});
+  } else {
+    bgVideo.style.display = "none"; bgVideo.pause(); bgContainer.style.backgroundImage = `url('${item.url}')`;
+  }
+}
+
+chooseVideoFileBtn.addEventListener("click", () => { localVideoInput.click(); });
+localVideoInput.addEventListener("change", function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const localBlobUrl = URL.createObjectURL(file); const isVideo = file.type.includes("video");
+  const newItem = { url: localBlobUrl, type: isVideo ? "video" : "image" };
+  const thumbBox = document.createElement("div"); thumbBox.className = "wallpaper-thumb active";
+  if (isVideo) {
+    const vid = document.createElement("video"); vid.src = localBlobUrl; vid.preload = "metadata"; vid.muted = true; vid.playsInline = true; thumbBox.appendChild(vid);
+  } else {
+    const img = document.createElement("img"); img.src = localBlobUrl; thumbBox.appendChild(img);
+  }
+  thumbBox.addEventListener("click", () => {
+    document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
+    thumbBox.classList.add("active"); applyWallpaper(newItem);
+  });
+  document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
+  wallpaperGrid.insertBefore(thumbBox, wallpaperGrid.firstChild);
+  applyWallpaper(newItem);
+});
+
+// Effects Processing Loop
+const pCan = bgEffectsCanvas; const pCtx = pCan.getContext('2d'); let pArr = []; let pType = effectSelect?.value || 'snow';
+let mX = -9999, mY = -9999; window.addEventListener('mousemove', (e) => { mX = e.clientX; mY = e.clientY; });
+function resPCan() { if (!pCan) return; pCan.width = window.innerWidth; pCan.height = window.innerHeight; initP(); }
+window.addEventListener('resize', resPCan);
+function initP() { pArr = []; if (!pCan || pType === 'none') return; for (let i = 0; i < 100; i++) { pArr.push(createP(true)); } }
+function createP(init = false) {
+  let x = Math.random() * pCan.width; let y = init ? Math.random() * pCan.height : -10;
+  let s = Math.random() * 3 + 1; let vx = Math.random() * 1 - 0.5; let vy = Math.random() * 2 + 1; let a = Math.random() * 0.5 + 0.3;
+  if (pType === 'fireflies') { y = Math.random() * pCan.height; vx = Math.random() * 2 - 1; vy = Math.random() * 2 - 1; s = Math.random() * 4 + 2; }
+  else if (pType === 'nexus') { y = Math.random() * pCan.height; vx = Math.random() * 1 - 0.5; vy = Math.random() * 1 - 0.5; s = 2; }
+  else if (pType === 'rain') { vy = Math.random() * 10 + 10; vx = -2; s = Math.random() * 2 + 1; }
+  return { x, y, s, vx, vy, a };
+}
+function updP() {
+  if (!pCan || pType === 'none') { pCtx?.clearRect(0,0,pCan.width,pCan.height); requestAnimationFrame(updP); return; }
+  pCtx.clearRect(0, 0, pCan.width, pCan.height);
+  pArr.forEach((p, idx) => {
+    if (pType === 'fireflies') {
+      let dx = mX - p.x; let dy = mY - p.y; let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 100) { p.vx -= dx * 0.005; p.vy -= dy * 0.005; }
+    }
+    if (pType === 'nexus') {
+      pArr.forEach(p2 => {
+        let d2 = Math.sqrt(Math.pow(p2.x - p.x, 2) + Math.pow(p2.y - p.y, 2));
+        if (d2 < 80) { pCtx.beginPath(); pCtx.moveTo(p.x, p.y); pCtx.lineTo(p2.x, p2.y); pCtx.strokeStyle = `rgba(255,255,255,${1 - (d2 / 80)})`; pCtx.stroke(); }
+      });
+    }
+    p.x += p.vx; p.y += p.vy;
+    if (p.y > window.innerHeight || p.x < 0 || p.x > window.innerWidth) pArr[idx] = createP();
+    pCtx.fillStyle = `rgba(255,255,255,${p.a})`; pCtx.beginPath();
+    if (pType === 'rain') { pCtx.strokeStyle = `rgba(255,255,255,${p.a*0.4})`; pCtx.moveTo(p.x, p.y); pCtx.lineTo(p.x+p.vx*2, p.y+p.vy*2); pCtx.stroke(); }
+    else { pCtx.arc(p.x, p.y, p.s, 0, Math.PI * 2); pCtx.fill(); }
+  });
+  requestAnimationFrame(updP);
+}
+if (effectSelect) effectSelect.addEventListener('change', (e) => { pType = e.target.value; initP(); });
+
+// Application Startup hooks
+setupDragAndDrop();
+resPCan();
+updP();
+fetchAllWallpapers();
+</script>
+</body>
+</html>
