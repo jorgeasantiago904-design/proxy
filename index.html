@@ -734,7 +734,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">sonflix</div>
+    <div class="window-title">netflix</div>
   </div>
   <div class="window-body" id="imessageBodyContainer">
     <div class="resize-overlay"></div>
@@ -748,7 +748,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">SonTube</div>
+    <div class="window-title">youTube</div>
   </div>
   <div class="window-body" id="sontubeBodyContainer">
     <div class="resize-overlay"></div>
@@ -790,7 +790,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">Browser Workspace</div>
+    <div class="window-title">Browser</div>
   </div>
   <div class="window-body" id="safariBodyContainer">
     <div class="resize-overlay"></div>
@@ -1189,21 +1189,24 @@ function onMouseDown(e) {
   // Clear timers safely
   if (holdTimer) clearTimeout(holdTimer);
 
-  // Requirement: Hold mouse down for 400ms to start grabbing/dragging operations
-  holdTimer = setTimeout(() => {
-    dragTriggered = true;
-    activeDraggedItem = targetLI;
-    
-    const rect = activeDraggedItem.getBoundingClientRect();
-    dragOffset.x = e.clientX - rect.left;
-    dragOffset.y = e.clientY - rect.top;
-    
-    activeDraggedItem.classList.add("dragging");
-    activeDraggedItem.style.left = `${rect.left}px`;
-    activeDraggedItem.style.top = `${rect.top}px`;
-    
-    document.addEventListener("mousemove", onMouseMove);
-  }, 400);
+  // Prevent grabbing/dragging App Menu and Settings icons
+  if (!targetLI.classList.contains("system-protected")) {
+    // Requirement: Hold mouse down for 400ms to start grabbing/dragging operations
+    holdTimer = setTimeout(() => {
+      dragTriggered = true;
+      activeDraggedItem = targetLI;
+      
+      const rect = activeDraggedItem.getBoundingClientRect();
+      dragOffset.x = e.clientX - rect.left;
+      dragOffset.y = e.clientY - rect.top;
+      
+      activeDraggedItem.classList.add("dragging");
+      activeDraggedItem.style.left = `${rect.left}px`;
+      activeDraggedItem.style.top = `${rect.top}px`;
+      
+      document.addEventListener("mousemove", onMouseMove);
+    }, 400);
+  }
 
   document.addEventListener("mouseup", onMouseUp);
 }
@@ -1257,8 +1260,14 @@ function onMouseUp(e) {
     activeDraggedItem.style.top = "";
     
     const list = document.getElementById("dockContainerList");
-    const sep = document.getElementById("dockSep");
-    list.insertBefore(activeDraggedItem, sep); // Enforces placement inside secure areas of dock structure
+    // Place dropped app within dock borders (between dock separators)
+    const sepSecond = document.getElementById("dockSepSecond");
+    if (sepSecond) {
+      list.insertBefore(activeDraggedItem, sepSecond);
+    } else {
+      const sep = document.getElementById("dockSep");
+      list.insertBefore(activeDraggedItem, sep ? sep.nextSibling : null);
+    }
   } else {
     activeDraggedItem.classList.remove("dragging");
     activeDraggedItem.className = "desktop-floating-icon";
