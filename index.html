@@ -798,6 +798,34 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
+<div id="calcWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeCalcBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">sol ai</div>
+  </div>
+  <div class="window-body" id="calcBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="weatherWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeWeatherBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">minecraft launcher</div>
+  </div>
+  <div class="window-body" id="weatherBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
 <div id="cloakingWindow" class="settings-window">
   <div class="settings-header">
     <div class="traffic-lights">
@@ -933,6 +961,14 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="name">brower</div>
       <img class="ico" src="https://vorssaint.com/app-icon.png" alt="Safari">
     </li>
+    <li class="li-calc" id="calcDockIcon" data-app="calc">
+      <div class="name">sol ai</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Calculator_25pUePky2n_lowResPng-822830fccf.png" alt="Calculator">
+    </li>
+    <li class="li-weather" id="weatherDockIcon" data-app="weather">
+      <div class="name">minecraft launcher</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Weather_S6Q5dY1m22_lowResPng-662580c85c.png" alt="Weather">
+    </li>
     
     <div class="dock-separator standard-separator" id="dockSepSecond"></div>
 
@@ -952,6 +988,8 @@ const APPS = {
   sontube: { title: "YouTube", icon: "https://s3-new.macosicons.com/macosicons/parse/Youtube_Zn2CyUOnOT_lowResPng-d7f85aea0d.png", pinned: true, id: "sontube" },
   music: { title: "Music", icon: "https://s3-new.macosicons.com/macosicons/parse/Background_Music_App_hbgEd7xGxB_lowResPng-98a4969416.png", pinned: true, id: "music" },
   safari: { title: "Browser", icon: "https://vorssaint.com/app-icon.png", pinned: true, id: "safari" },
+  calc: { title: "Calculator", icon: "https://s3-new.macosicons.com/macosicons/parse/Calculator_25pUePky2n_lowResPng-822830fccf.png", pinned: true, id: "calc" },
+  weather: { title: "Weather", icon: "https://s3-new.macosicons.com/macosicons/parse/Weather_S6Q5dY1m22_lowResPng-662580c85c.png", pinned: true, id: "weather" },
  
 };
 
@@ -1051,7 +1089,9 @@ function filterApps(val) {
     sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html",
     notes: "https://jorgeasantiago904-design.github.io/games/", 
     music: "https://jorgeasantiago904-design.github.io/music/#/home",
-    safari: "https://jorgeasantiago904-design.github.io/browser/"
+    safari: "https://jorgeasantiago904-design.github.io/browser/",
+    calc: "https://www.desmos.com/scientific",
+    weather: "https://wttr.in/"
   };
   
   const setupFrame = (containerId, srcUrl, isCodeFetch = false) => {
@@ -1076,6 +1116,8 @@ function filterApps(val) {
   setupFrame("gamehubBodyContainer", secureFrames.notes);
   setupFrame("musicBodyContainer", secureFrames.music);
   setupFrame("safariBodyContainer", secureFrames.safari);
+  setupFrame("calcBodyContainer", secureFrames.calc);
+  setupFrame("weatherBodyContainer", secureFrames.weather);
 })();
 
 // UI Window Configurations Maps
@@ -1101,6 +1143,10 @@ const musicWindow = document.getElementById("musicWindow");
 const closeMusicBtn = document.getElementById("closeMusicBtn");
 const safariWindow = document.getElementById("safariWindow");
 const closeSafariBtn = document.getElementById("closeSafariBtn");
+const calcWindow = document.getElementById("calcWindow");
+const closeCalcBtn = document.getElementById("closeCalcBtn");
+const weatherWindow = document.getElementById("weatherWindow");
+const closeWeatherBtn = document.getElementById("closeWeatherBtn");
 
 // Wallpaper Engine Variables
 const bgContainer = document.getElementById("bgContainer");
@@ -1353,6 +1399,10 @@ function launchApp(appType) {
     targetWin = musicWindow;
   } else if (appType === "safari") {
     targetWin = safariWindow;
+  } else if (appType === "calc") {
+    targetWin = calcWindow;
+  } else if (appType === "weather") {
+    targetWin = weatherWindow;
   } else if (appType === "bin") {
     targetWin = settingsWindow;
   } else if (appType === "finder") {
@@ -1371,6 +1421,8 @@ closeSontubeBtn.addEventListener("click", () => sontubeWindow.classList.remove("
 closeGamehubBtn.addEventListener("click", () => gamehubWindow.classList.remove("open"));
 closeMusicBtn.addEventListener("click", () => musicWindow.classList.remove("open"));
 closeSafariBtn.addEventListener("click", () => safariWindow.classList.remove("open"));
+closeCalcBtn.addEventListener("click", () => calcWindow.classList.remove("open"));
+closeWeatherBtn.addEventListener("click", () => weatherWindow.classList.remove("open"));
 
 // Window Global Mousedown Listener to bring active window to front AND trigger resize overlay safety
 document.querySelectorAll('.app-window, .settings-window').forEach(win => {
