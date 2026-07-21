@@ -74,7 +74,7 @@ body {
   background: rgba(0, 0, 0, 0.6);
   border-bottom: 1px solid rgba(34, 34, 34, 0.5);
   border-top: 1px solid transparent;
-  display: none !important; /* Hides the visual clock bar without breaking internal JS state loops */
+  display: none !important;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
@@ -403,7 +403,7 @@ body.dock-right .day-cycle-bar {
   position: relative;
   overflow: visible !important;
   will-change: transform;
-  background: transparent !important; /* Forces container box/circle background to be completely invisible */
+  background: transparent !important;
 }
 
 .dock-container li.dragging {
@@ -415,15 +415,14 @@ body.dock-right .day-cycle-bar {
   transform: scale(1.3) !important;
 }
 
-/* Enforces uniform transparent sizing while automatically auto-scaling non-fitting PNG graphics */
 .dock-container .ico {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Automatically scales oversized/mismatched PNGs perfectly to itself without cropping */
-  border-radius: 0; /* Box/circle frame container shapes are completely eliminated */
+  object-fit: contain;
+  border-radius: 0;
   display: block;
   pointer-events: none;
-  background-color: transparent !important; /* Box/circle element background layer is completely invisible */
+  background-color: transparent !important;
 }
 
 /* --- Tooltip Labels (Solid) --- */
@@ -530,7 +529,7 @@ body.dock-right .dock-separator {
   left: calc(50vw - 220px);
   transform: scale(0.9);
   width: 440px;
-  height: 500px; /* Added height to prevent sizing bugs */
+  height: 500px;
   min-width: 300px;
   min-height: 250px;
   resize: both;
@@ -673,14 +672,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   justify-content: center;
   width: 75px;
   height: 75px;
-  background: transparent !important; /* Floating application container background box remains fully invisible */
+  background: transparent !important;
 }
 .desktop-floating-icon .ico {
   width: 50px;
   height: 50px;
-  object-fit: contain; /* Auto scales floating icons perfectly into itself if dimensions change */
+  object-fit: contain;
   border-radius: 0;
-  background-color: transparent !important; /* Visual inner box layer disappears, only exposing the raw PNG format */
+  background-color: transparent !important;
   pointer-events: none;
 }
 .desktop-floating-icon .name {
@@ -967,7 +966,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </li>
     <li class="li-weather" id="weatherDockIcon" data-app="weather">
       <div class="name">minecraft launcher</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Minecraft__Transparent__Isy70ivAnA_lowResPng-7c660f5955.png" alt="Weather">
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Minecraft_NoV5rqgjbL_lowResPng-315e304658.png" alt="Weather">
     </li>
     
     <div class="dock-separator standard-separator" id="dockSepSecond"></div>
@@ -982,15 +981,23 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 // --- Configurable Web Application Repositories ---
 const APPS = {
- 
   notes: { title: "Game Hub", icon: "https://s3-new.macosicons.com/macosicons/parse/Logitech_G_HUB_YSJq2Cg6sW_lowResPng-464507086e.png", pinned: true, id: "notes" },
   imessage: { title: "netflix", icon: "https://s3.macosicons.com/macosicons/icons/XExethG2Tn/lowResPngFile_6ac9445b516514dbdea33edb68b84d5c_XExethG2Tn.png", pinned: true, id: "imessage" },
   sontube: { title: "YouTube", icon: "https://s3-new.macosicons.com/macosicons/parse/Youtube_Zn2CyUOnOT_lowResPng-d7f85aea0d.png", pinned: true, id: "sontube" },
   music: { title: "Music", icon: "https://s3-new.macosicons.com/macosicons/parse/Background_Music_App_hbgEd7xGxB_lowResPng-98a4969416.png", pinned: true, id: "music" },
   safari: { title: "Browser", icon: "https://vorssaint.com/app-icon.png", pinned: true, id: "safari" },
   calc: { title: "sol ai", icon: "https://s3-new.macosicons.com/macosicons/parse/Flux_Kontext__Black_Bubble__Assistant__AI_Chat__Sparkle__Liquid_Glass__GSlQWhIKGh_lowResPng-f9e1c38394.png", pinned: true, id: "calc" },
-  weather: { title: "minecraft launcher", icon: "https://s3-new.macosicons.com/macosicons/parse/Minecraft__Transparent__Isy70ivAnA_lowResPng-7c660f5955.png", pinned: true, id: "weather" },
- 
+  weather: { title: "minecraft launcher", icon: "https://s3-new.macosicons.com/macosicons/parse/Minecraft_NoV5rqgjbL_lowResPng-315e304658.png", pinned: true, id: "weather" },
+};
+
+const secureFrames = {
+  imessage: { url: "https://jorgeasantiago904-design.github.io/sonflix/", containerId: "imessageBodyContainer" },
+  sontube: { url: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html", containerId: "sontubeBodyContainer", fetchCode: true },
+  notes: { url: "https://jorgeasantiago904-design.github.io/games/", containerId: "gamehubBodyContainer" }, 
+  music: { url: "https://jorgeasantiago904-design.github.io/music/#/home", containerId: "musicBodyContainer" },
+  safari: { url: "https://jorgeasantiago904-design.github.io/browser/", containerId: "safariBodyContainer" },
+  calc: { url: "https://www.desmos.com/scientific", containerId: "calcBodyContainer" },
+  weather: { url: "https://yee.pages.dev/#/bW9yZS9tb3JlL21vZGRlZC9lYWdseWpz", containerId: "weatherBodyContainer" }
 };
 
 // Global Z-Index Manager to automatically overlap menus correctly
@@ -1015,10 +1022,8 @@ function syncDockWithPins() {
   const currentSeparators = container.querySelectorAll(".dock-separator");
   const firstSep = currentSeparators[0];
   
-  // Clear old app elements out of dock
   container.querySelectorAll("li:not(.system-protected)").forEach(el => el.remove());
 
-  // Re-inject apps back safely inside the dock list
   for (let key in APPS) {
     let app = APPS[key];
     if (app.pinned) {
@@ -1060,14 +1065,14 @@ function openFinderMenu() {
   vp.style.display = 'block';
   setTimeout(() => {
       fm.classList.add('open');
-      bringWindowToFront(fm); // Bring Finder menu to the absolute front
+      bringWindowToFront(fm);
   }, 10);
 }
 
 function closeFinderMenu() {
   let fm = document.getElementById('finder-menu');
   let vp = document.getElementById('finder-viewport');
-  fm.removeClassName ? fm.removeClassName('open') : fm.classList.remove('open');
+  fm.classList.remove('open');
   setTimeout(() => {
     fm.style.display = 'none';
     vp.style.display = 'none';
@@ -1082,43 +1087,43 @@ function filterApps(val) {
   });
 }
 
-// Frame Security Logic
-(function injectDynamicAppFrames() {
-  const secureFrames = {
-    imessage: "https://jorgeasantiago904-design.github.io/sonflix/",
-    sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html",
-    notes: "https://jorgeasantiago904-design.github.io/games/", 
-    music: "https://jorgeasantiago904-design.github.io/music/#/home",
-    safari: "https://jorgeasantiago904-design.github.io/browser/",
-    calc: "https://www.desmos.com/scientific",
-    weather: "https://yee.pages.dev/#/bW9yZS9tb3JlL21vZGRlZC9lYWdseWpz"
-  };
+// Frame Injection & Dynamic Deletion Handlers
+function setupFrame(appKey) {
+  const config = secureFrames[appKey];
+  if (!config) return;
+  const container = document.getElementById(config.containerId);
+  if (!container) return;
   
-  const setupFrame = (containerId, srcUrl, isCodeFetch = false) => {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const frame = document.createElement("iframe");
-    frame.setAttribute("allowfullscreen", "true");
-    frame.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
-    if (isCodeFetch) {
-      fetch(srcUrl)
-        .then(res => res.text())
-        .then(html => { frame.srcdoc = html; })
-        .catch(() => { frame.src = srcUrl; });
-    } else {
-      frame.src = srcUrl;
-    }
-    container.appendChild(frame);
-  };
+  // If iframe is already running, don't recreate it
+  if (container.querySelector("iframe")) return;
 
-  setupFrame("imessageBodyContainer", secureFrames.imessage);
-  setupFrame("sontubeBodyContainer", secureFrames.sontube, true);
-  setupFrame("gamehubBodyContainer", secureFrames.notes);
-  setupFrame("musicBodyContainer", secureFrames.music);
-  setupFrame("safariBodyContainer", secureFrames.safari);
-  setupFrame("calcBodyContainer", secureFrames.calc);
-  setupFrame("weatherBodyContainer", secureFrames.weather);
-})();
+  const frame = document.createElement("iframe");
+  frame.setAttribute("allowfullscreen", "true");
+  frame.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
+  
+  if (config.fetchCode) {
+    fetch(config.url)
+      .then(res => res.text())
+      .then(html => { frame.srcdoc = html; })
+      .catch(() => { frame.src = config.url; });
+  } else {
+    frame.src = config.url;
+  }
+  container.appendChild(frame);
+}
+
+function destroyFrame(appKey) {
+  const config = secureFrames[appKey];
+  if (!config) return;
+  const container = document.getElementById(config.containerId);
+  if (!container) return;
+  
+  const frame = container.querySelector("iframe");
+  if (frame) {
+    frame.src = "about:blank"; // Force audio/video to immediately stop playing
+    frame.remove();            // Remove element completely from DOM
+  }
+}
 
 // UI Window Configurations Maps
 const menu = document.getElementById("contextMenu");
@@ -1229,7 +1234,7 @@ async function fetchWallpapersFromSource(sourceUrl = defaultWallpaperSource) {
   } catch (error) { console.warn(error); throw error; }
 }
 
-// --- Drag and Drop Setup with "Hold-to-Grab" Logic ---
+// --- Drag and Drop Setup ---
 let activeDraggedItem = null;
 let dragOffset = { x: 0, y: 0 };
 let holdTimer = null;
@@ -1244,13 +1249,9 @@ function onMouseDown(e) {
   if (!targetLI) return;
 
   dragTriggered = false;
-
-  // Clear timers safely
   if (holdTimer) clearTimeout(holdTimer);
 
-  // Prevent grabbing/dragging App Menu and Settings icons
   if (!targetLI.classList.contains("system-protected")) {
-    // Requirement: Hold mouse down for 400ms to start grabbing/dragging operations
     holdTimer = setTimeout(() => {
       dragTriggered = true;
       activeDraggedItem = targetLI;
@@ -1282,7 +1283,6 @@ function onMouseUp(e) {
   document.removeEventListener("mouseup", onMouseUp);
 
   if (!dragTriggered) {
-    // If released before 400ms, consider it a clean simple click operation
     const clickedItem = e.target.closest(".dock-container li, .desktop-floating-icon");
     if (clickedItem) handleAppLaunch(clickedItem);
     return;
@@ -1290,9 +1290,7 @@ function onMouseUp(e) {
 
   if (!activeDraggedItem) return;
   
-  // Custom logic: Safeguard to prevent items from sticking on line separators
   const droppedOnSeparator = e.target.closest(".dock-separator");
-  
   const bin = document.getElementById("binDockIcon");
   const binRect = bin.getBoundingClientRect();
   
@@ -1309,7 +1307,6 @@ function onMouseUp(e) {
   const dock = document.getElementById("macDock");
   const dockRect = dock.getBoundingClientRect();
   
-  // Verify constraints to make sure apps do not overwrite line layers
   if ((e.clientX >= dockRect.left && e.clientX <= dockRect.right &&
       e.clientY >= dockRect.top && e.clientY <= dockRect.bottom) || droppedOnSeparator) {
     activeDraggedItem.classList.remove("dragging");
@@ -1319,7 +1316,6 @@ function onMouseUp(e) {
     activeDraggedItem.style.top = "";
     
     const list = document.getElementById("dockContainerList");
-    // Place dropped app within dock borders (between dock separators)
     const sepSecond = document.getElementById("dockSepSecond");
     if (sepSecond) {
       list.insertBefore(activeDraggedItem, sepSecond);
@@ -1391,18 +1387,25 @@ function launchApp(appType) {
   
   if (appType === "imessage" || appType === "sonflix") {
     targetWin = imessageWindow;
+    setupFrame("imessage");
   } else if (appType === "sontube") {
     targetWin = sontubeWindow;
+    setupFrame("sontube");
   } else if (appType === "notes") {
     targetWin = gamehubWindow;
+    setupFrame("notes");
   } else if (appType === "music") {
     targetWin = musicWindow;
+    setupFrame("music");
   } else if (appType === "safari") {
     targetWin = safariWindow;
+    setupFrame("safari");
   } else if (appType === "calc") {
     targetWin = calcWindow;
+    setupFrame("calc");
   } else if (appType === "weather") {
     targetWin = weatherWindow;
+    setupFrame("weather");
   } else if (appType === "bin") {
     targetWin = settingsWindow;
   } else if (appType === "finder") {
@@ -1412,27 +1415,25 @@ function launchApp(appType) {
 
   if (targetWin) {
     targetWin.classList.add("open");
-    bringWindowToFront(targetWin); // Fix: Automatically overlaps other menus/apps
+    bringWindowToFront(targetWin);
   }
 }
 
-closeImessageBtn.addEventListener("click", () => imessageWindow.classList.remove("open"));
-closeSontubeBtn.addEventListener("click", () => sontubeWindow.classList.remove("open"));
-closeGamehubBtn.addEventListener("click", () => gamehubWindow.classList.remove("open"));
-closeMusicBtn.addEventListener("click", () => musicWindow.classList.remove("open"));
-closeSafariBtn.addEventListener("click", () => safariWindow.classList.remove("open"));
-closeCalcBtn.addEventListener("click", () => calcWindow.classList.remove("open"));
-closeWeatherBtn.addEventListener("click", () => weatherWindow.classList.remove("open"));
+// Red Close Button Listeners (Destroys the inner iframe/website completely on click)
+closeImessageBtn.addEventListener("click", () => { imessageWindow.classList.remove("open"); destroyFrame("imessage"); });
+closeSontubeBtn.addEventListener("click", () => { sontubeWindow.classList.remove("open"); destroyFrame("sontube"); });
+closeGamehubBtn.addEventListener("click", () => { gamehubWindow.classList.remove("open"); destroyFrame("notes"); });
+closeMusicBtn.addEventListener("click", () => { musicWindow.classList.remove("open"); destroyFrame("music"); });
+closeSafariBtn.addEventListener("click", () => { safariWindow.classList.remove("open"); destroyFrame("safari"); });
+closeCalcBtn.addEventListener("click", () => { calcWindow.classList.remove("open"); destroyFrame("calc"); });
+closeWeatherBtn.addEventListener("click", () => { weatherWindow.classList.remove("open"); destroyFrame("weather"); });
 
-// Window Global Mousedown Listener to bring active window to front AND trigger resize overlay safety
+// Window Global Mousedown Listener
 document.querySelectorAll('.app-window, .settings-window').forEach(win => {
   win.addEventListener('mousedown', (e) => {
-    // 1. Instantly pull window to the front
     bringWindowToFront(win);
     
-    // 2. Fix the iframe mouse-steal resizing bug
     const rect = win.getBoundingClientRect();
-    // If the click is near the bottom right resizing corner
     if (e.clientX > rect.right - 25 && e.clientY > rect.bottom - 25) {
       const overlay = win.querySelector('.resize-overlay');
       if (overlay) overlay.style.display = 'block';
@@ -1446,7 +1447,7 @@ document.querySelectorAll('.app-window, .settings-window').forEach(win => {
   });
 });
 
-// Window Header Logic (Draggable & Screen Boundaries Constrained)
+// Window Header Logic
 document.querySelectorAll('.light.minimize').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const win = e.target.closest('.app-window, .settings-window');
@@ -1466,7 +1467,6 @@ document.querySelectorAll('.window-header').forEach(header => {
     const win = header.closest('.app-window, .settings-window');
     if (win.classList.contains('maximized')) return;
 
-    // Pull the dragged window directly to the front
     bringWindowToFront(win);
 
     const overlay = win.querySelector('.resize-overlay');
@@ -1481,13 +1481,9 @@ document.querySelectorAll('.window-header').forEach(header => {
       let newLeft = winLeft + (ev.clientX - startX);
       let newTop = winTop + (ev.clientY - startY);
       
-      const rect = win.getBoundingClientRect();
-      
-      // Fix: Math adjustment so oversized windows don't instantly jump weirdly
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
       
-      // Keep it somewhat on screen without strictly forcing big windows to violently snap
       if (newLeft > window.innerWidth - 60) newLeft = window.innerWidth - 60;
       if (newTop > window.innerHeight - 60) newTop = window.innerHeight - 60;
 
@@ -1525,7 +1521,6 @@ document.addEventListener("contextmenu", (e) => {
 });
 document.addEventListener("click", () => { menu.style.display = "none"; });
 
-// Bring Cloaking menu and Dock prefs up to the front when clicked
 openSettingsBtn.addEventListener("click", (e) => { 
   e.stopPropagation(); 
   settingsWindow.classList.add("open"); 
@@ -1557,7 +1552,6 @@ async function fetchAllWallpapers(sourceUrl) {
     renderWallpaperGrid(wallpaperItems);
     setStatus(`Loaded ${wallpaperItems.length} wallpaper(s).`);
     
-    // Auto restore previous session active wallpaper if saved
     const savedActiveWallpaper = localStorage.getItem('premium_active_wallpaper_url');
     if (savedActiveWallpaper) {
       const savedType = localStorage.getItem('premium_active_wallpaper_type') || 'image';
@@ -1581,7 +1575,6 @@ async function fetchAllWallpapers(sourceUrl) {
 function renderWallpaperGrid(mediaItems) {
   wallpaperGrid.innerHTML = "";
   
-  // Inject any imported local wallpapers saved in localStorage first
   const storedImports = JSON.parse(localStorage.getItem('premium_imported_wallpapers') || '[]');
   const absoluteCollection = [...storedImports, ...mediaItems];
 
@@ -1619,17 +1612,14 @@ chooseVideoFileBtn.addEventListener("click", () => { localVideoInput.click(); })
 localVideoInput.addEventListener("change", function(e) {
   const file = e.target.files[0]; if (!file) return;
   
-  // Convert smaller image imports directly to persistent base64 data for storage safely
   const reader = new FileReader();
   reader.onload = function(evt) {
     const dataUrl = evt.target.result;
     const isVideo = file.type.includes("video");
     const newItem = { url: dataUrl, type: isVideo ? "video" : "image" };
     
-    // Save imported wallpapers to local storage registry array
     const currentImports = JSON.parse(localStorage.getItem('premium_imported_wallpapers') || '[]');
     currentImports.unshift(newItem);
-    // Limit store size to prevent local storage quota overflow drops
     if(currentImports.length > 5) currentImports.pop();
     localStorage.setItem('premium_imported_wallpapers', JSON.stringify(currentImports));
 
@@ -1699,7 +1689,6 @@ function initDayCycleClock() {
   const cycleIcon = document.getElementById("cycleIcon");
   const widgetBar = document.getElementById("dayCycleWidget");
   
-  // Setting a dynamic raw git resource backdrop signature styling parameter safely
   widgetBar.style.backgroundImage = "url('https://raw.githubusercontent.com/jorgeasantiago904-design/WALLPAPER-FF/main/day_night_horizon.png')";
   widgetBar.style.backgroundSize = "cover";
   widgetBar.style.backgroundPosition = "center";
@@ -1721,7 +1710,7 @@ function initDayCycleClock() {
   }, 1000);
 }
 
-// Global Preferences Initializer Recovery Hook
+// Global Preferences Initializer
 function loadSavedPreferences() {
   const savedPosition = localStorage.getItem('premium_dock_position') || 'bottom';
   updateDockPosition(savedPosition);
