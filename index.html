@@ -530,6 +530,7 @@ body.dock-right .dock-separator {
   left: calc(50vw - 220px);
   transform: scale(0.9);
   width: 440px;
+  height: 500px; /* Added height to prevent sizing bugs */
   min-width: 300px;
   min-height: 250px;
   resize: both;
@@ -548,7 +549,7 @@ body.dock-right .dock-separator {
 }
 
 .settings-window.open { opacity: 1; pointer-events: auto; transform: scale(1); }
-.settings-header { height: 42px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #222222; flex-shrink: 0; }
+.settings-header { height: 42px; display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #222222; flex-shrink: 0; cursor: move; }
 .settings-header .traffic-lights { position: absolute; left: 16px; top: 14px; }
 .settings-title { font-size: 15px; font-weight: 600; color: #eeeeee; }
 .settings-content { padding: 20px; flex: 1; overflow-y: auto; }
@@ -954,6 +955,15 @@ const APPS = {
  
 };
 
+// Global Z-Index Manager to automatically overlap menus correctly
+let highestZIndex = 10000;
+
+function bringWindowToFront(win) {
+  if (!win) return;
+  highestZIndex++;
+  win.style.zIndex = highestZIndex;
+}
+
 function toggleMenuPin(appKey) {
   const app = APPS[appKey];
   if (!app) return;
@@ -1010,7 +1020,10 @@ function openFinderMenu() {
   let vp = document.getElementById('finder-viewport');
   fm.style.display = 'flex';
   vp.style.display = 'block';
-  setTimeout(() => fm.classList.add('open'), 10);
+  setTimeout(() => {
+      fm.classList.add('open');
+      bringWindowToFront(fm); // Bring Finder menu to the absolute front
+  }, 10);
 }
 
 function closeFinderMenu() {
@@ -1328,20 +1341,28 @@ function handleAppLaunch(element) {
 }
 
 function launchApp(appType) {
+  let targetWin = null;
+  
   if (appType === "imessage" || appType === "sonflix") {
-    imessageWindow.classList.add("open");
+    targetWin = imessageWindow;
   } else if (appType === "sontube") {
-    sontubeWindow.classList.add("open");
+    targetWin = sontubeWindow;
   } else if (appType === "notes") {
-    gamehubWindow.classList.add("open");
+    targetWin = gamehubWindow;
   } else if (appType === "music") {
-    musicWindow.classList.add("open");
+    targetWin = musicWindow;
   } else if (appType === "safari") {
-    safariWindow.classList.add("open");
+    targetWin = safariWindow;
   } else if (appType === "bin") {
-    settingsWindow.classList.add("open");
+    targetWin = settingsWindow;
   } else if (appType === "finder") {
     openFinderMenu();
+    return;
+  }
+
+  if (targetWin) {
+    targetWin.classList.add("open");
+    bringWindowToFront(targetWin); // Fix: Automatically overlaps other menus/apps
   }
 }
 
@@ -1350,6 +1371,28 @@ closeSontubeBtn.addEventListener("click", () => sontubeWindow.classList.remove("
 closeGamehubBtn.addEventListener("click", () => gamehubWindow.classList.remove("open"));
 closeMusicBtn.addEventListener("click", () => musicWindow.classList.remove("open"));
 closeSafariBtn.addEventListener("click", () => safariWindow.classList.remove("open"));
+
+// Window Global Mousedown Listener to bring active window to front AND trigger resize overlay safety
+document.querySelectorAll('.app-window, .settings-window').forEach(win => {
+  win.addEventListener('mousedown', (e) => {
+    // 1. Instantly pull window to the front
+    bringWindowToFront(win);
+    
+    // 2. Fix the iframe mouse-steal resizing bug
+    const rect = win.getBoundingClientRect();
+    // If the click is near the bottom right resizing corner
+    if (e.clientX > rect.right - 25 && e.clientY > rect.bottom - 25) {
+      const overlay = win.querySelector('.resize-overlay');
+      if (overlay) overlay.style.display = 'block';
+
+      const stopResize = () => {
+         if(overlay) overlay.style.display = 'none';
+         document.removeEventListener('mouseup', stopResize);
+      };
+      document.addEventListener('mouseup', stopResize);
+    }
+  });
+});
 
 // Window Header Logic (Draggable & Screen Boundaries Constrained)
 document.querySelectorAll('.light.minimize').forEach(btn => {
@@ -1371,6 +1414,9 @@ document.querySelectorAll('.window-header').forEach(header => {
     const win = header.closest('.app-window, .settings-window');
     if (win.classList.contains('maximized')) return;
 
+    // Pull the dragged window directly to the front
+    bringWindowToFront(win);
+
     const overlay = win.querySelector('.resize-overlay');
     if (overlay) overlay.style.display = 'block';
 
@@ -1384,10 +1430,14 @@ document.querySelectorAll('.window-header').forEach(header => {
       let newTop = winTop + (ev.clientY - startY);
       
       const rect = win.getBoundingClientRect();
+      
+      // Fix: Math adjustment so oversized windows don't instantly jump weirdly
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
-      if (newLeft + rect.width > window.innerWidth) newLeft = window.innerWidth - rect.width;
-      if (newTop + rect.height > window.innerHeight) newTop = window.innerHeight - rect.height;
+      
+      // Keep it somewhat on screen without strictly forcing big windows to violently snap
+      if (newLeft > window.innerWidth - 60) newLeft = window.innerWidth - 60;
+      if (newTop > window.innerHeight - 60) newTop = window.innerHeight - 60;
 
       win.style.left = `${newLeft}px`;
       win.style.top = `${newTop}px`;
@@ -1422,8 +1472,19 @@ document.addEventListener("contextmenu", (e) => {
   menu.style.left = `${x}px`; menu.style.top = `${y}px`;
 });
 document.addEventListener("click", () => { menu.style.display = "none"; });
-openSettingsBtn.addEventListener("click", (e) => { e.stopPropagation(); settingsWindow.classList.add("open"); });
-openCloakingBtnMenu.addEventListener("click", (e) => { e.stopPropagation(); cloakingWindow.classList.add("open"); });
+
+// Bring Cloaking menu and Dock prefs up to the front when clicked
+openSettingsBtn.addEventListener("click", (e) => { 
+  e.stopPropagation(); 
+  settingsWindow.classList.add("open"); 
+  bringWindowToFront(settingsWindow);
+});
+openCloakingBtnMenu.addEventListener("click", (e) => { 
+  e.stopPropagation(); 
+  cloakingWindow.classList.add("open"); 
+  bringWindowToFront(cloakingWindow);
+});
+
 closeSettingsBtn.addEventListener("click", () => { settingsWindow.classList.remove("open"); });
 closeCloakingBtn.addEventListener("click", () => { cloakingWindow.classList.remove("open"); });
 
