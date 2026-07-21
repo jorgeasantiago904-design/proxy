@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <script>window.livecodes = window.livecodes || {};</script>
-<link class="js-site-favicon" rel="icon" type="image/jpg" href="https://upload.wikimedia.org/wikipedia/commons/8/86/IOS_15_logo.svg">
-<title>macOS Premium Desktop Studio</title>
+<link class="js-site-favicon" id="siteFavicon" rel="icon" type="image/jpg" href="https://upload.wikimedia.org/wikipedia/commons/8/86/IOS_15_logo.svg">
+<title id="siteTitle">macOS Premium Desktop Studio</title>
 <meta name="title" content="macOS Premium Desktop Studio">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -62,6 +62,47 @@ body {
   height: 100vh;
   z-index: 0;
   pointer-events: none;
+}
+
+/* --- Day/Night Cycle Widget Layer --- */
+.day-cycle-bar {
+  position: fixed;
+  left: 0;
+  width: 100vw;
+  height: 34px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(34, 34, 34, 0.5);
+  border-top: 1px solid transparent;
+  display: none !important; /* Hides the visual clock bar without breaking internal JS state loops */
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  pointer-events: auto;
+}
+
+body.dock-top .day-cycle-bar {
+  bottom: 0;
+  top: auto;
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid rgba(34, 34, 34, 0.5);
+}
+
+body.dock-bottom .day-cycle-bar,
+body.dock-left .day-cycle-bar,
+body.dock-right .day-cycle-bar {
+  top: 0;
+  bottom: auto;
+}
+
+.day-cycle-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* --- Solid Black Window Manager --- */
@@ -179,7 +220,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
-  width: 560px;
+  width: 600px;
   height: 580px;
   background: #000000;
   border: 1px solid #222222;
@@ -253,11 +294,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 15px 10px;
+  padding: 12px 8px;
   border-radius: 12px;
   cursor: pointer;
   transition: 0.2s;
   border: 1px solid transparent;
+  position: relative;
 }
 
 .pinned-app-card:hover {
@@ -270,7 +312,7 @@ body {
   height: 44px;
   border-radius: 10px;
   margin-bottom: 8px;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .pinned-app-card span {
@@ -278,6 +320,21 @@ body {
   color: #dddddd;
   text-align: center;
   font-weight: 600;
+}
+
+.pin-toggle-btn {
+  margin-top: 6px;
+  font-size: 11px;
+  background: #111;
+  border: 1px solid #333;
+  color: #aaa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pin-toggle-btn:hover {
+  background: #222;
+  color: #fff;
 }
 
 .start-panel-footer {
@@ -315,7 +372,7 @@ body {
 
 /* --- Solid Dock Base Layout --- */
 .dock {
-  position: absolute;
+  position: fixed;
   display: flex;
   z-index: 10;
   overflow: visible !important;
@@ -346,6 +403,7 @@ body {
   position: relative;
   overflow: visible !important;
   will-change: transform;
+  background: transparent !important; /* Forces container box/circle background to be completely invisible */
 }
 
 .dock-container li.dragging {
@@ -357,12 +415,15 @@ body {
   transform: scale(1.3) !important;
 }
 
+/* Enforces uniform transparent sizing while automatically auto-scaling non-fitting PNG graphics */
 .dock-container .ico {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  display: inline-block;
+  object-fit: contain; /* Automatically scales oversized/mismatched PNGs perfectly to itself without cropping */
+  border-radius: 0; /* Box/circle frame container shapes are completely eliminated */
+  display: block;
   pointer-events: none;
+  background-color: transparent !important; /* Box/circle element background layer is completely invisible */
 }
 
 /* --- Tooltip Labels (Solid) --- */
@@ -394,7 +455,7 @@ body.dock-bottom .dock-container li:not(.dragging) { transform-origin: 50% 100%;
 body.dock-bottom .dock-container li:hover:not(.dragging) { margin: 0 12px; }
 body.dock-bottom .dock-container .name { top: -45px; left: 50%; transform: translateX(-50%); }
 
-body.dock-top .dock { top: 15px; left: 50%; transform: translateX(-50%); height: calc(var(--dock-size, 50px) + 10px); justify-content: center; }
+body.dock-top .dock { top: 45px; left: 50%; transform: translateX(-50%); height: calc(var(--dock-size, 50px) + 10px); justify-content: center; }
 body.dock-top .dock-container { flex-direction: row; }
 body.dock-top .dock-container li:not(.dragging) { transform-origin: 50% 0%; }
 body.dock-top .dock-container li:hover:not(.dragging) { margin: 0 12px; }
@@ -432,7 +493,7 @@ body.dock-right .dock-separator {
   margin: 12px 0;
 }
 
-.dock-container .ico-bin { width: 90% !important; height: 90% !important; object-fit: contain; }
+.dock-container .ico-bin { width: 100% !important; height: 100% !important; object-fit: contain; border-radius: 0; background-color: transparent !important; }
 
 /* --- Solid Context Menu --- */
 .context-menu {
@@ -611,11 +672,14 @@ input:checked + .slider:before { transform: translateX(20px); }
   justify-content: center;
   width: 75px;
   height: 75px;
+  background: transparent !important; /* Floating application container background box remains fully invisible */
 }
 .desktop-floating-icon .ico {
   width: 50px;
   height: 50px;
-  object-fit: contain;
+  object-fit: contain; /* Auto scales floating icons perfectly into itself if dimensions change */
+  border-radius: 0;
+  background-color: transparent !important; /* Visual inner box layer disappears, only exposing the raw PNG format */
   pointer-events: none;
 }
 .desktop-floating-icon .name {
@@ -636,6 +700,14 @@ input:checked + .slider:before { transform: translateX(20px); }
 <video id="bgVideo" autoplay muted loop playsinline></video>
 <canvas id="bgEffectsCanvas"></canvas>
 
+<div class="day-cycle-bar" id="dayCycleWidget">
+  <div class="day-cycle-content">
+    <i class="fas fa-adjust" id="cycleIcon"></i>
+    <span id="cycleLabel">Studio Ecosystem Horizon</span>
+  </div>
+  <div id="cycleTimeDisplay">00:00:00</div>
+</div>
+
 <div class="desktop-viewport" id="finder-viewport" onclick="closeFinderMenu()"></div>
 <aside id="finder-menu" class="finder-panel" aria-label="Finder Applications">
   <div class="search-container">
@@ -654,6 +726,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
   </footer>
 </aside>
+
 <div id="imessageWindow" class="app-window">
   <div class="window-header">
     <div class="traffic-lights">
@@ -682,10 +755,80 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
+<div id="gamehubWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeGamehubBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">Game Hub</div>
+  </div>
+  <div class="window-body" id="gamehubBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="musicWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeMusicBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">Music</div>
+  </div>
+  <div class="window-body" id="musicBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="safariWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeSafariBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">Browser Workspace</div>
+  </div>
+  <div class="window-body" id="safariBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
+</div>
+
+<div id="cloakingWindow" class="settings-window">
+  <div class="settings-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeCloakingBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="settings-title">Tab Anti-Guardian Cloaking</div>
+  </div>
+  <div class="settings-content">
+    <div class="settings-section-title">Mask Tab Metadata (Disguise Filter Logs)</div>
+    <div class="control-row" style="margin-bottom: 12px; gap: 8px;">
+      <label for="maskPresets">Preset Mask</label>
+      <select id="maskPresets" class="mac-select" onchange="applyTabMask(this.value)">
+        <option value="default">Default macOS Theme</option>
+        <option value="google">Google Drive Docs</option>
+        <option value="canvas">Canvas Portal</option>
+        <option value="math">Edgenuity / Algebra Help</option>
+      </select>
+    </div>
+    <p style="font-size:12px; color:#888; line-height:1.4; margin-bottom:12px;">Changes favicon and layout title signature variables instantly to bypass generic network snapshot triggers.</p>
+  </div>
+</div>
+
 <div id="contextMenu" class="context-menu">
   <div class="context-menu-item" id="openSettingsBtn">
     <span>Dock Preferences...</span>
     <span>⚙️</span>
+  </div>
+  <div class="context-menu-item" id="openCloakingBtnMenu">
+    <span>Tab Cloaking Guard...</span>
+    <span>🛡️</span>
   </div>
   <div class="context-menu-separator"></div>
   <div class="context-menu-item position-trigger" data-pos="bottom"><span>Position: Bottom</span></div>
@@ -768,14 +911,14 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="name">app menu</div>
       <img class="ico" src="https://img.icons8.com/?size=100&id=78290&format=png&color=FFFFFF" alt="Finder">
     </li>
- <div class="dock-separator" id="dockSep"></div>
+    <div class="dock-separator standard-separator" id="dockSep"></div>
     <li class="li-5" id="notesDockIcon" data-app="notes">
       <div class="name">game hub</div>
       <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Daemon_qinVvjxuZV_lowResPng-8c499dce93.png" alt="Notes">
     </li>
-   <li class="li-8" id="imessageDockIcon" data-app="imessage">
+    <li class="li-8" id="imessageDockIcon" data-app="imessage">
       <div class="name">sonflix</div>
-      <img class="ico" src="file:///home/chronos/u-ad2c8152a48bbd608b1c3798498e0bbcd5c18118/MyFiles/Downloads/index%20-%202026-07-19T052648.795.html" alt="Messages">
+      <img class="ico" src="https://s3.macosicons.com/macosicons/icons/XExethG2Tn/lowResPngFile_6ac9445b516514dbdea33edb68b84d5c_XExethG2Tn.png" alt="Messages">
     </li>
     <li class="li-y" id="sontubeDockIcon" data-app="sontube">
       <div class="name">youtube</div>
@@ -790,7 +933,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <img class="ico" src="https://vorssaint.com/app-icon.png" alt="Safari">
     </li>
     
-    <div class="dock-separator" id="dockSep"></div>
+    <div class="dock-separator standard-separator" id="dockSepSecond"></div>
 
     <li class="li-bin li-15 system-protected" id="binDockIcon" data-app="bin">
       <div class="name">settings</div>
@@ -800,28 +943,66 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <script>
-// --- Finder Menu Setup ---
+// --- Configurable Web Application Repositories ---
 const APPS = {
- 
+  finder: { title: "App Menu", icon: "https://img.icons8.com/?size=100&id=78290&format=png&color=FFFFFF", pinned: false, id: "finder" },
+  notes: { title: "Game Hub", icon: "https://s3-new.macosicons.com/macosicons/parse/Daemon_qinVvjxuZV_lowResPng-8c499dce93.png", pinned: true, id: "notes" },
+  imessage: { title: "Sonflix", icon: "https://s3.macosicons.com/macosicons/icons/XExethG2Tn/lowResPngFile_6ac9445b516514dbdea33edb68b84d5c_XExethG2Tn.png", pinned: true, id: "imessage" },
+  sontube: { title: "YouTube", icon: "https://github.com/jorgeasantiago904-design/icons-for-my-unblocker-/blob/main/4ad86a50-e939-40a7-ba25-39a68835179c.png?raw=true", pinned: true, id: "sontube" },
+  music: { title: "Music", icon: "https://www.freeiconspng.com/uploads/black-music-icon-26.png", pinned: true, id: "music" },
+  safari: { title: "Browser", icon: "https://vorssaint.com/app-icon.png", pinned: true, id: "safari" },
+  bin: { title: "Settings", icon: "https://github.com/jorgeasantiago904-design/icons-for-my-unblocker-/blob/main/8c7cc485-1780-490f-a527-c1b62bb6672b.png?raw=true", pinned: false, id: "bin" }
 };
 
-function buildInterface() {
-  const startGrid = document.getElementById('pinned-apps-layout');
-  startGrid.innerHTML = '';
+function toggleMenuPin(appKey) {
+  const app = APPS[appKey];
+  if (!app) return;
+  app.pinned = !app.pinned;
+  buildInterface();
+  syncDockWithPins();
+}
+
+function syncDockWithPins() {
+  const container = document.getElementById("dockContainerList");
+  const currentSeparators = container.querySelectorAll(".dock-separator");
+  const firstSep = currentSeparators[0];
+  
+  // Clear old app elements out of dock
+  container.querySelectorAll("li:not(.system-protected)").forEach(el => el.remove());
+
+  // Re-inject apps back safely inside the dock list
   for (let key in APPS) {
     let app = APPS[key];
     if (app.pinned) {
-      let sItem = document.createElement('div');
-      sItem.className = 'pinned-app-card';
-      sItem.onclick = () => { launchApp(app.title); };
-      sItem.innerHTML = `<img src="${app.icon}" alt="${app.title}"><span>${app.title}</span>`;
-      startGrid.appendChild(sItem);
+      let li = document.createElement("li");
+      li.id = `${key}DockIcon`;
+      li.setAttribute("data-app", key);
+      li.innerHTML = `<div class="name">${app.title.toLowerCase()}</div><img class="ico" src="${app.icon}" alt="${app.title}">`;
+      container.insertBefore(li, firstSep.nextSibling);
     }
   }
+  resetIcons();
 }
 
-function launchApp(name) {
-  alert(`Launching Application: ${name}`);
+function buildInterface() {
+  const startGrid = document.getElementById('pinned-apps-layout');
+  if (!startGrid) return;
+  startGrid.innerHTML = '';
+  for (let key in APPS) {
+    let app = APPS[key];
+    let sItem = document.createElement('div');
+    sItem.className = 'pinned-app-card';
+    sItem.innerHTML = `
+      <div onclick="launchApp('${app.id}')" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+        <img src="${app.icon}" alt="${app.title}">
+        <span>${app.title}</span>
+      </div>
+      <button class="pin-toggle-btn" onclick="event.stopPropagation(); toggleMenuPin('${key}')">
+        ${app.pinned ? 'Unpin' : 'Pin to Dock'}
+      </button>
+    `;
+    startGrid.appendChild(sItem);
+  }
 }
 
 function openFinderMenu() {
@@ -835,7 +1016,7 @@ function openFinderMenu() {
 function closeFinderMenu() {
   let fm = document.getElementById('finder-menu');
   let vp = document.getElementById('finder-viewport');
-  fm.classList.remove('open');
+  fm.removeClassName ? fm.removeClassName('open') : fm.classList.remove('open');
   setTimeout(() => {
     fm.style.display = 'none';
     vp.style.display = 'none';
@@ -849,49 +1030,49 @@ function filterApps(val) {
     card.style.display = name.includes(val.toLowerCase()) ? 'flex' : 'none';
   });
 }
-// --- /Finder Menu Setup ---
 
 // Frame Security Logic
 (function injectDynamicAppFrames() {
   const secureFrames = {
     imessage: "https://jorgeasantiago904-design.github.io/sonflix/",
-    // Updated setup to run standard embed URL direct without standard secure layout restrictions
-    sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html"
+    sontube: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html",
+    notes: "https://jorgeasantiago904-design.github.io/games/", 
+    music: "https://jorgeasantiago904-design.github.io/music/",
+    safari: "https://jorgeasantiago904-design.github.io/browser/"
   };
   
-  const imsgContainer = document.getElementById("imessageBodyContainer");
-  if (imsgContainer) {
-    const frame = document.createElement("iframe");
-    frame.src = secureFrames.imessage;
-    imsgContainer.appendChild(frame);
-  }
-  
-  const tubeContainer = document.getElementById("sontubeBodyContainer");
-  if (tubeContainer) {
+  const setupFrame = (containerId, srcUrl, isCodeFetch = false) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
     const frame = document.createElement("iframe");
     frame.setAttribute("allowfullscreen", "true");
     frame.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture");
-    
-    // Grabs the code raw from the CDN and runs it directly in the frame preview
-    fetch(secureFrames.sontube)
-      .then(response => response.text())
-      .then(htmlCode => {
-        frame.srcdoc = htmlCode;
-      })
-      .catch(error => {
-        console.warn("Direct code execution fetch failed, falling back to frame source:", error);
-        frame.src = secureFrames.sontube;
-      });
-      
-    tubeContainer.appendChild(frame);
-  }
+    if (isCodeFetch) {
+      fetch(srcUrl)
+        .then(res => res.text())
+        .then(html => { frame.srcdoc = html; })
+        .catch(() => { frame.src = srcUrl; });
+    } else {
+      frame.src = srcUrl;
+    }
+    container.appendChild(frame);
+  };
+
+  setupFrame("imessageBodyContainer", secureFrames.imessage);
+  setupFrame("sontubeBodyContainer", secureFrames.sontube, true);
+  setupFrame("gamehubBodyContainer", secureFrames.notes);
+  setupFrame("musicBodyContainer", secureFrames.music);
+  setupFrame("safariBodyContainer", secureFrames.safari);
 })();
 
-// UI Elements Configuration Map
+// UI Window Configurations Maps
 const menu = document.getElementById("contextMenu");
 const openSettingsBtn = document.getElementById("openSettingsBtn");
+const openCloakingBtnMenu = document.getElementById("openCloakingBtnMenu");
 const settingsWindow = document.getElementById("settingsWindow");
+const cloakingWindow = document.getElementById("cloakingWindow");
 const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+const closeCloakingBtn = document.getElementById("closeCloakingBtn");
 const sizeSlider = document.getElementById("sizeSlider");
 const loopToggle = document.getElementById("loopToggle");
 const positionSelect = document.getElementById("positionSelect");
@@ -901,6 +1082,12 @@ const imessageWindow = document.getElementById("imessageWindow");
 const closeImessageBtn = document.getElementById("closeImessageBtn");
 const sontubeWindow = document.getElementById("sontubeWindow");
 const closeSontubeBtn = document.getElementById("closeSontubeBtn");
+const gamehubWindow = document.getElementById("gamehubWindow");
+const closeGamehubBtn = document.getElementById("closeGamehubBtn");
+const musicWindow = document.getElementById("musicWindow");
+const closeMusicBtn = document.getElementById("closeMusicBtn");
+const safariWindow = document.getElementById("safariWindow");
+const closeSafariBtn = document.getElementById("closeSafariBtn");
 
 // Wallpaper Engine Variables
 const bgContainer = document.getElementById("bgContainer");
@@ -916,6 +1103,24 @@ const effectSelect = document.getElementById('effectSelect');
 
 const defaultWallpaperSource = "https://github.com/jorgeasantiago904-design/WALLPAPER-FF";
 let currentWallpaperSource = defaultWallpaperSource;
+
+function applyTabMask(preset) {
+  const iconEl = document.getElementById("siteFavicon");
+  const titleEl = document.getElementById("siteTitle");
+  if (preset === "google") {
+    iconEl.href = "https://ssl.gstatic.com/docs/doclist/images/infinite_drive_2022q4.ico";
+    titleEl.innerText = "My Drive - Google Drive";
+  } else if (preset === "canvas") {
+    iconEl.href = "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e0549e3752.ico";
+    titleEl.innerText = "Dashboard - Canvas";
+  } else if (preset === "math") {
+    iconEl.href = "https://student.edgenuity.com/favicon.ico";
+    titleEl.innerText = "Edgenuity Student Core Portal";
+  } else {
+    iconEl.href = "https://upload.wikimedia.org/wikipedia/commons/8/86/IOS_15_logo.svg";
+    titleEl.innerText = "macOS Premium Desktop Studio";
+  }
+}
 
 function setStatus(text) { statusLabel.innerText = text; }
 function isDirectMediaUrl(url) { return /\.(mp4|mov|png|jpe?g|gif|webp)(\?.*)?$/i.test(url); }
@@ -965,10 +1170,11 @@ async function fetchWallpapersFromSource(sourceUrl = defaultWallpaperSource) {
   } catch (error) { console.warn(error); throw error; }
 }
 
-// --- Double Click and Hold Setup ---
+// --- Drag and Drop Setup with "Hold-to-Grab" Logic ---
 let activeDraggedItem = null;
 let dragOffset = { x: 0, y: 0 };
-let lastClickTime = 0;
+let holdTimer = null;
+let dragTriggered = false;
 
 function setupDragAndDrop() {
   document.addEventListener("mousedown", onMouseDown);
@@ -978,20 +1184,14 @@ function onMouseDown(e) {
   const targetLI = e.target.closest(".dock-container li, .desktop-floating-icon");
   if (!targetLI) return;
 
-  // Safeguard logic
-  if (targetLI.classList.contains("system-protected")) {
-    const appType = targetLI.getAttribute("data-app");
-    if (appType === "finder" || appType === "bin") {
-      if (appType === "finder") handleAppLaunch(targetLI);
-      return;
-    }
-  }
+  dragTriggered = false;
 
-  const currentTime = new Date().getTime();
-  const timeDiff = currentTime - lastClickTime;
+  // Clear timers safely
+  if (holdTimer) clearTimeout(holdTimer);
 
-  if (timeDiff < 350) {
-    e.preventDefault();
+  // Requirement: Hold mouse down for 400ms to start grabbing/dragging operations
+  holdTimer = setTimeout(() => {
+    dragTriggered = true;
     activeDraggedItem = targetLI;
     
     const rect = activeDraggedItem.getBoundingClientRect();
@@ -1003,30 +1203,42 @@ function onMouseDown(e) {
     activeDraggedItem.style.top = `${rect.top}px`;
     
     document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  } else {
-    handleAppLaunch(targetLI);
-  }
-  lastClickTime = currentTime;
+  }, 400);
+
+  document.addEventListener("mouseup", onMouseUp);
 }
 
 function onMouseMove(e) {
-  if (!activeDraggedItem) return;
+  if (!activeDraggedItem || !dragTriggered) return;
   activeDraggedItem.style.left = `${e.clientX - dragOffset.x}px`;
   activeDraggedItem.style.top = `${e.clientY - dragOffset.y}px`;
 }
 
 function onMouseUp(e) {
-  if (!activeDraggedItem) return;
+  if (holdTimer) clearTimeout(holdTimer);
   document.removeEventListener("mousemove", onMouseMove);
   document.removeEventListener("mouseup", onMouseUp);
+
+  if (!dragTriggered) {
+    // If released before 400ms, consider it a clean simple click operation
+    const clickedItem = e.target.closest(".dock-container li, .desktop-floating-icon");
+    if (clickedItem) handleAppLaunch(clickedItem);
+    return;
+  }
+
+  if (!activeDraggedItem) return;
+  
+  // Custom logic: Safeguard to prevent items from sticking on line separators
+  const droppedOnSeparator = e.target.closest(".dock-separator");
   
   const bin = document.getElementById("binDockIcon");
   const binRect = bin.getBoundingClientRect();
   
   if (e.clientX >= binRect.left && e.clientX <= binRect.right &&
       e.clientY >= binRect.top && e.clientY <= binRect.bottom) {
-    activeDraggedItem.remove();
+    if (!activeDraggedItem.classList.contains("system-protected")) {
+      activeDraggedItem.remove();
+    }
     activeDraggedItem = null;
     resetIcons();
     return;
@@ -1035,16 +1247,18 @@ function onMouseUp(e) {
   const dock = document.getElementById("macDock");
   const dockRect = dock.getBoundingClientRect();
   
-  if (e.clientX >= dockRect.left && e.clientX <= dockRect.right &&
-      e.clientY >= dockRect.top && e.clientY <= dockRect.bottom) {
+  // Verify constraints to make sure apps do not overwrite line layers
+  if ((e.clientX >= dockRect.left && e.clientX <= dockRect.right &&
+      e.clientY >= dockRect.top && e.clientY <= dockRect.bottom) || droppedOnSeparator) {
     activeDraggedItem.classList.remove("dragging");
     activeDraggedItem.className = "";
     activeDraggedItem.style.position = "";
     activeDraggedItem.style.left = "";
     activeDraggedItem.style.top = "";
+    
     const list = document.getElementById("dockContainerList");
     const sep = document.getElementById("dockSep");
-    list.insertBefore(activeDraggedItem, sep);
+    list.insertBefore(activeDraggedItem, sep); // Enforces placement inside secure areas of dock structure
   } else {
     activeDraggedItem.classList.remove("dragging");
     activeDraggedItem.className = "desktop-floating-icon";
@@ -1101,20 +1315,34 @@ document.getElementById("dockContainerList").addEventListener("mouseleave", rese
 // Application Execution Handlers
 function handleAppLaunch(element) {
   const appType = element.getAttribute("data-app");
-  if (appType === "imessage") {
+  launchApp(appType);
+}
+
+function launchApp(appType) {
+  if (appType === "imessage" || appType === "sonflix") {
     imessageWindow.classList.add("open");
   } else if (appType === "sontube") {
     sontubeWindow.classList.add("open");
+  } else if (appType === "notes") {
+    gamehubWindow.classList.add("open");
+  } else if (appType === "music") {
+    musicWindow.classList.add("open");
+  } else if (appType === "safari") {
+    safariWindow.classList.add("open");
+  } else if (appType === "bin") {
+    settingsWindow.classList.add("open");
   } else if (appType === "finder") {
-    // --- Hooked up Finder menu trigger here ---
     openFinderMenu();
   }
 }
 
 closeImessageBtn.addEventListener("click", () => imessageWindow.classList.remove("open"));
 closeSontubeBtn.addEventListener("click", () => sontubeWindow.classList.remove("open"));
+closeGamehubBtn.addEventListener("click", () => gamehubWindow.classList.remove("open"));
+closeMusicBtn.addEventListener("click", () => musicWindow.classList.remove("open"));
+closeSafariBtn.addEventListener("click", () => safariWindow.classList.remove("open"));
 
-// Window Header Logic (Draggable & Screen Boundaries Contrained)
+// Window Header Logic (Draggable & Screen Boundaries Constrained)
 document.querySelectorAll('.light.minimize').forEach(btn => {
   btn.addEventListener('click', (e) => {
     const win = e.target.closest('.app-window, .settings-window');
@@ -1134,7 +1362,6 @@ document.querySelectorAll('.window-header').forEach(header => {
     const win = header.closest('.app-window, .settings-window');
     if (win.classList.contains('maximized')) return;
 
-    // Show resize overlay inside windows to prevent iframe mouse event loss
     const overlay = win.querySelector('.resize-overlay');
     if (overlay) overlay.style.display = 'block';
 
@@ -1147,7 +1374,6 @@ document.querySelectorAll('.window-header').forEach(header => {
       let newLeft = winLeft + (ev.clientX - startX);
       let newTop = winTop + (ev.clientY - startY);
       
-      // Constrain window bounds to keep inside screen boundaries
       const rect = win.getBoundingClientRect();
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
@@ -1171,6 +1397,7 @@ document.querySelectorAll('.window-header').forEach(header => {
 function updateDockPosition(newPosition) {
   document.body.className = `dock-${newPosition}`;
   positionSelect.value = newPosition;
+  localStorage.setItem('premium_dock_position', newPosition);
   resetIcons();
 }
 positionSelect.addEventListener("change", (e) => { updateDockPosition(e.target.value); });
@@ -1187,9 +1414,18 @@ document.addEventListener("contextmenu", (e) => {
 });
 document.addEventListener("click", () => { menu.style.display = "none"; });
 openSettingsBtn.addEventListener("click", (e) => { e.stopPropagation(); settingsWindow.classList.add("open"); });
+openCloakingBtnMenu.addEventListener("click", (e) => { e.stopPropagation(); cloakingWindow.classList.add("open"); });
 closeSettingsBtn.addEventListener("click", () => { settingsWindow.classList.remove("open"); });
-sizeSlider.addEventListener("input", (e) => { document.documentElement.style.setProperty('--dock-size', `${e.target.value}px`); });
-loopToggle.addEventListener("change", (e) => { bgVideo.loop = e.target.checked; });
+closeCloakingBtn.addEventListener("click", () => { cloakingWindow.classList.remove("open"); });
+
+sizeSlider.addEventListener("input", (e) => { 
+  document.documentElement.style.setProperty('--dock-size', `${e.target.value}px`); 
+  localStorage.setItem('premium_dock_size', e.target.value);
+});
+loopToggle.addEventListener("change", (e) => { 
+  bgVideo.loop = e.target.checked; 
+  localStorage.setItem('premium_bg_loop', e.target.checked ? "true" : "false");
+});
 
 async function fetchAllWallpapers(sourceUrl) {
   try {
@@ -1198,15 +1434,36 @@ async function fetchAllWallpapers(sourceUrl) {
     wallpaperSourceInput.value = currentWallpaperSource;
     renderWallpaperGrid(wallpaperItems);
     setStatus(`Loaded ${wallpaperItems.length} wallpaper(s).`);
+    
+    // Auto restore previous session active wallpaper if saved
+    const savedActiveWallpaper = localStorage.getItem('premium_active_wallpaper_url');
+    if (savedActiveWallpaper) {
+      const savedType = localStorage.getItem('premium_active_wallpaper_type') || 'image';
+      applyWallpaper({ url: savedActiveWallpaper, type: savedType });
+      setTimeout(() => {
+        document.querySelectorAll(".wallpaper-thumb").forEach(t => {
+          const src = t.querySelector('img, video')?.src;
+          if (src === savedActiveWallpaper) {
+            t.classList.add('active');
+          } else {
+            t.classList.remove('active');
+          }
+        });
+      }, 600);
+    }
   } catch (err) {
     setStatus("Using default wallpapers.");
-    renderWallpaperGrid(fallbackWallpapers);
   }
 }
 
 function renderWallpaperGrid(mediaItems) {
   wallpaperGrid.innerHTML = "";
-  mediaItems.forEach((mediaItem, index) => {
+  
+  // Inject any imported local wallpapers saved in localStorage first
+  const storedImports = JSON.parse(localStorage.getItem('premium_imported_wallpapers') || '[]');
+  const absoluteCollection = [...storedImports, ...mediaItems];
+
+  absoluteCollection.forEach((mediaItem, index) => {
     const thumbBox = document.createElement("div");
     thumbBox.className = `wallpaper-thumb ${index === 0 ? 'active' : ''}`;
     if (mediaItem.type === "video") {
@@ -1222,7 +1479,7 @@ function renderWallpaperGrid(mediaItems) {
       applyWallpaper(mediaItem);
     });
     wallpaperGrid.appendChild(thumbBox);
-    if (index === 0) applyWallpaper(mediaItem);
+    if (index === 0 && !localStorage.getItem('premium_active_wallpaper_url')) applyWallpaper(mediaItem);
   });
 }
 
@@ -1232,26 +1489,43 @@ function applyWallpaper(item) {
   } else {
     bgVideo.style.display = "none"; bgVideo.pause(); bgContainer.style.backgroundImage = `url('${item.url}')`;
   }
+  localStorage.setItem('premium_active_wallpaper_url', item.url);
+  localStorage.setItem('premium_active_wallpaper_type', item.type);
 }
 
 chooseVideoFileBtn.addEventListener("click", () => { localVideoInput.click(); });
 localVideoInput.addEventListener("change", function(e) {
   const file = e.target.files[0]; if (!file) return;
-  const localBlobUrl = URL.createObjectURL(file); const isVideo = file.type.includes("video");
-  const newItem = { url: localBlobUrl, type: isVideo ? "video" : "image" };
-  const thumbBox = document.createElement("div"); thumbBox.className = "wallpaper-thumb active";
-  if (isVideo) {
-    const vid = document.createElement("video"); vid.src = localBlobUrl; vid.preload = "metadata"; vid.muted = true; vid.playsInline = true; thumbBox.appendChild(vid);
-  } else {
-    const img = document.createElement("img"); img.src = localBlobUrl; thumbBox.appendChild(img);
-  }
-  thumbBox.addEventListener("click", () => {
+  
+  // Convert smaller image imports directly to persistent base64 data for storage safely
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const isVideo = file.type.includes("video");
+    const newItem = { url: dataUrl, type: isVideo ? "video" : "image" };
+    
+    // Save imported wallpapers to local storage registry array
+    const currentImports = JSON.parse(localStorage.getItem('premium_imported_wallpapers') || '[]');
+    currentImports.unshift(newItem);
+    // Limit store size to prevent local storage quota overflow drops
+    if(currentImports.length > 5) currentImports.pop();
+    localStorage.setItem('premium_imported_wallpapers', JSON.stringify(currentImports));
+
+    const thumbBox = document.createElement("div"); thumbBox.className = "wallpaper-thumb active";
+    if (isVideo) {
+      const vid = document.createElement("video"); vid.src = dataUrl; vid.preload = "metadata"; vid.muted = true; vid.playsInline = true; thumbBox.appendChild(vid);
+    } else {
+      const img = document.createElement("img"); img.src = dataUrl; thumbBox.appendChild(img);
+    }
+    thumbBox.addEventListener("click", () => {
+      document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
+      thumbBox.classList.add("active"); applyWallpaper(newItem);
+    });
     document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
-    thumbBox.classList.add("active"); applyWallpaper(newItem);
-  });
-  document.querySelectorAll(".wallpaper-thumb").forEach(t => t.classList.remove("active"));
-  wallpaperGrid.insertBefore(thumbBox, wallpaperGrid.firstChild);
-  applyWallpaper(newItem);
+    wallpaperGrid.insertBefore(thumbBox, wallpaperGrid.firstChild);
+    applyWallpaper(newItem);
+  };
+  reader.readAsDataURL(file);
 });
 
 // Effects Processing Loop
@@ -1290,14 +1564,74 @@ function updP() {
   });
   requestAnimationFrame(updP);
 }
-if (effectSelect) effectSelect.addEventListener('change', (e) => { pType = e.target.value; initP(); });
+if (effectSelect) effectSelect.addEventListener('change', (e) => { 
+  pType = e.target.value; 
+  localStorage.setItem('premium_bg_effect', pType);
+  initP(); 
+});
+
+// Day Cycle Realtime Processing Loop
+function initDayCycleClock() {
+  const timeDisplay = document.getElementById("cycleTimeDisplay");
+  const cycleLabel = document.getElementById("cycleLabel");
+  const cycleIcon = document.getElementById("cycleIcon");
+  const widgetBar = document.getElementById("dayCycleWidget");
+  
+  // Setting a dynamic raw git resource backdrop signature styling parameter safely
+  widgetBar.style.backgroundImage = "url('https://raw.githubusercontent.com/jorgeasantiago904-design/WALLPAPER-FF/main/day_night_horizon.png')";
+  widgetBar.style.backgroundSize = "cover";
+  widgetBar.style.backgroundPosition = "center";
+
+  setInterval(() => {
+    const now = new Date();
+    const hours = now.getHours();
+    timeDisplay.innerText = now.toTimeString().split(' ')[0];
+    
+    if (hours >= 6 && hours < 18) {
+      cycleLabel.innerText = "Solar Cycle // Light Mode Active";
+      cycleIcon.className = "fas fa-sun";
+      cycleIcon.style.color = "#ffbd2e";
+    } else {
+      cycleLabel.innerText = "Lunar Cycle // Dark Mode Active";
+      cycleIcon.className = "fas fa-moon";
+      cycleIcon.style.color = "#9b51e0";
+    }
+  }, 1000);
+}
+
+// Global Preferences Initializer Recovery Hook
+function loadSavedPreferences() {
+  const savedPosition = localStorage.getItem('premium_dock_position') || 'bottom';
+  updateDockPosition(savedPosition);
+  
+  const savedSize = localStorage.getItem('premium_dock_size');
+  if (savedSize) {
+    sizeSlider.value = savedSize;
+    document.documentElement.style.setProperty('--dock-size', `${savedSize}px`);
+  }
+  
+  const savedEffect = localStorage.getItem('premium_bg_effect');
+  if (savedEffect && effectSelect) {
+    effectSelect.value = savedEffect;
+    pType = savedEffect;
+  }
+  
+  const savedLoop = localStorage.getItem('premium_bg_loop');
+  if (savedLoop && loopToggle) {
+    const isTrue = savedLoop === "true";
+    loopToggle.checked = isTrue;
+    bgVideo.loop = isTrue;
+  }
+}
 
 // Application Startup hooks
+loadSavedPreferences();
 setupDragAndDrop();
 resPCan();
 updP();
 fetchAllWallpapers();
-buildInterface(); // Build the Finder layout behind the scenes on load
+buildInterface();
+initDayCycleClock();
 </script>
 </body>
 </html>
