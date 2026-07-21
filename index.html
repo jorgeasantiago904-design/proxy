@@ -113,6 +113,8 @@ body.dock-right .day-cycle-bar {
   transform: scale(0.9);
   width: 950px;
   height: 650px;
+  max-width: 100vw;
+  max-height: 100vh;
   min-width: 350px;
   min-height: 250px;
   resize: both;
@@ -222,6 +224,8 @@ body.dock-right .day-cycle-bar {
   transform: translate(-50%, -50%) scale(0.95);
   width: 600px;
   height: 580px;
+  max-width: 100vw;
+  max-height: 100vh;
   background: #000000;
   border: 1px solid #222222;
   border-radius: 16px;
@@ -530,6 +534,8 @@ body.dock-right .dock-separator {
   transform: scale(0.9);
   width: 440px;
   height: 500px;
+  max-width: 100vw;
+  max-height: 100vh;
   min-width: 300px;
   min-height: 250px;
   resize: both;
@@ -1261,8 +1267,19 @@ function onMouseDown(e) {
       dragOffset.y = e.clientY - rect.top;
       
       activeDraggedItem.classList.add("dragging");
-      activeDraggedItem.style.left = `${rect.left}px`;
-      activeDraggedItem.style.top = `${rect.top}px`;
+      
+      let initialLeft = rect.left;
+      let initialTop = rect.top;
+      const w = activeDraggedItem.offsetWidth || 75;
+      const h = activeDraggedItem.offsetHeight || 75;
+
+      if (initialLeft < 0) initialLeft = 0;
+      if (initialTop < 0) initialTop = 0;
+      if (initialLeft > window.innerWidth - w) initialLeft = Math.max(0, window.innerWidth - w);
+      if (initialTop > window.innerHeight - h) initialTop = Math.max(0, window.innerHeight - h);
+
+      activeDraggedItem.style.left = `${initialLeft}px`;
+      activeDraggedItem.style.top = `${initialTop}px`;
       
       document.addEventListener("mousemove", onMouseMove);
     }, 400);
@@ -1273,8 +1290,19 @@ function onMouseDown(e) {
 
 function onMouseMove(e) {
   if (!activeDraggedItem || !dragTriggered) return;
-  activeDraggedItem.style.left = `${e.clientX - dragOffset.x}px`;
-  activeDraggedItem.style.top = `${e.clientY - dragOffset.y}px`;
+  let newLeft = e.clientX - dragOffset.x;
+  let newTop = e.clientY - dragOffset.y;
+  
+  const itemWidth = activeDraggedItem.offsetWidth || 75;
+  const itemHeight = activeDraggedItem.offsetHeight || 75;
+
+  if (newLeft < 0) newLeft = 0;
+  if (newTop < 0) newTop = 0;
+  if (newLeft > window.innerWidth - itemWidth) newLeft = Math.max(0, window.innerWidth - itemWidth);
+  if (newTop > window.innerHeight - itemHeight) newTop = Math.max(0, window.innerHeight - itemHeight);
+
+  activeDraggedItem.style.left = `${newLeft}px`;
+  activeDraggedItem.style.top = `${newTop}px`;
 }
 
 function onMouseUp(e) {
@@ -1331,8 +1359,11 @@ function onMouseUp(e) {
     const gridX = Math.round((e.clientX - dragOffset.x) / 85) * 85;
     const gridY = Math.round((e.clientY - dragOffset.y) / 85) * 85;
     
-    activeDraggedItem.style.left = `${Math.max(20, Math.min(window.innerWidth - 90, gridX))}px`;
-    activeDraggedItem.style.top = `${Math.max(50, Math.min(window.innerHeight - 120, gridY))}px`;
+    const iconWidth = activeDraggedItem.offsetWidth || 75;
+    const iconHeight = activeDraggedItem.offsetHeight || 75;
+
+    activeDraggedItem.style.left = `${Math.max(0, Math.min(window.innerWidth - iconWidth, gridX))}px`;
+    activeDraggedItem.style.top = `${Math.max(0, Math.min(window.innerHeight - iconHeight, gridY))}px`;
   }
   
   activeDraggedItem = null;
@@ -1416,6 +1447,20 @@ function launchApp(appType) {
   if (targetWin) {
     targetWin.classList.add("open");
     bringWindowToFront(targetWin);
+    
+    // Contain window position inside screen bounds on initial open
+    const winWidth = targetWin.offsetWidth || 950;
+    const winHeight = targetWin.offsetHeight || 650;
+    let currLeft = targetWin.offsetLeft;
+    let currTop = targetWin.offsetTop;
+
+    if (currLeft < 0) currLeft = 0;
+    if (currTop < 0) currTop = 0;
+    if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
+    if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
+
+    targetWin.style.left = `${currLeft}px`;
+    targetWin.style.top = `${currTop}px`;
   }
 }
 
@@ -1440,6 +1485,13 @@ document.querySelectorAll('.app-window, .settings-window').forEach(win => {
 
       const stopResize = () => {
          if(overlay) overlay.style.display = 'none';
+         
+         // Clamp dimensions after resize
+         const maxW = window.innerWidth - win.offsetLeft;
+         const maxH = window.innerHeight - win.offsetTop;
+         if (win.offsetWidth > maxW && maxW > 0) win.style.width = `${maxW}px`;
+         if (win.offsetHeight > maxH && maxH > 0) win.style.height = `${maxH}px`;
+
          document.removeEventListener('mouseup', stopResize);
       };
       document.addEventListener('mouseup', stopResize);
@@ -1481,11 +1533,18 @@ document.querySelectorAll('.window-header').forEach(header => {
       let newLeft = winLeft + (ev.clientX - startX);
       let newTop = winTop + (ev.clientY - startY);
       
+      const winWidth = win.offsetWidth;
+      const winHeight = win.offsetHeight;
+
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
       
-      if (newLeft > window.innerWidth - 60) newLeft = window.innerWidth - 60;
-      if (newTop > window.innerHeight - 60) newTop = window.innerHeight - 60;
+      if (newLeft > window.innerWidth - winWidth) {
+        newLeft = Math.max(0, window.innerWidth - winWidth);
+      }
+      if (newTop > window.innerHeight - winHeight) {
+        newTop = Math.max(0, window.innerHeight - winHeight);
+      }
 
       win.style.left = `${newLeft}px`;
       win.style.top = `${newTop}px`;
@@ -1515,8 +1574,15 @@ document.querySelectorAll(".position-trigger").forEach(btn => {
 document.addEventListener("contextmenu", (e) => {
   e.preventDefault(); menu.style.display = "block";
   let x = e.clientX; let y = e.clientY;
-  if (x + menu.offsetWidth > window.innerWidth) x = window.innerWidth - menu.offsetWidth - 10;
-  if (y + menu.offsetHeight > window.innerHeight) y = window.innerHeight - menu.offsetHeight - 10;
+  
+  const menuWidth = menu.offsetWidth || 190;
+  const menuHeight = menu.offsetHeight || 150;
+
+  if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth;
+  if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight;
+  if (x < 0) x = 0;
+  if (y < 0) y = 0;
+
   menu.style.left = `${x}px`; menu.style.top = `${y}px`;
 });
 document.addEventListener("click", () => { menu.style.display = "none"; });
@@ -1525,11 +1591,38 @@ openSettingsBtn.addEventListener("click", (e) => {
   e.stopPropagation(); 
   settingsWindow.classList.add("open"); 
   bringWindowToFront(settingsWindow);
+  
+  const winWidth = settingsWindow.offsetWidth || 440;
+  const winHeight = settingsWindow.offsetHeight || 500;
+  let currLeft = settingsWindow.offsetLeft;
+  let currTop = settingsWindow.offsetTop;
+
+  if (currLeft < 0) currLeft = 0;
+  if (currTop < 0) currTop = 0;
+  if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
+  if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
+
+  settingsWindow.style.left = `${currLeft}px`;
+  settingsWindow.style.top = `${currTop}px`;
 });
+
 openCloakingBtnMenu.addEventListener("click", (e) => { 
   e.stopPropagation(); 
   cloakingWindow.classList.add("open"); 
   bringWindowToFront(cloakingWindow);
+
+  const winWidth = cloakingWindow.offsetWidth || 440;
+  const winHeight = cloakingWindow.offsetHeight || 500;
+  let currLeft = cloakingWindow.offsetLeft;
+  let currTop = cloakingWindow.offsetTop;
+
+  if (currLeft < 0) currLeft = 0;
+  if (currTop < 0) currTop = 0;
+  if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
+  if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
+
+  cloakingWindow.style.left = `${currLeft}px`;
+  cloakingWindow.style.top = `${currTop}px`;
 });
 
 closeSettingsBtn.addEventListener("click", () => { settingsWindow.classList.remove("open"); });
@@ -1734,6 +1827,25 @@ function loadSavedPreferences() {
     bgVideo.loop = isTrue;
   }
 }
+
+// Ensure all open windows stay inside screen on window resize
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.app-window.open, .settings-window.open').forEach(win => {
+    if (win.classList.contains('maximized')) return;
+    const winWidth = win.offsetWidth;
+    const winHeight = win.offsetHeight;
+    let currLeft = win.offsetLeft;
+    let currTop = win.offsetTop;
+
+    if (currLeft < 0) currLeft = 0;
+    if (currTop < 0) currTop = 0;
+    if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
+    if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
+
+    win.style.left = `${currLeft}px`;
+    win.style.top = `${currTop}px`;
+  });
+});
 
 // Application Startup hooks
 loadSavedPreferences();
