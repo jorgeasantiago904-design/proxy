@@ -838,6 +838,18 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
+    <div id="animeWindow" class="app-window">
+  <div class="window-header">
+    <div class="traffic-lights">
+      <div class="light close" id="closeAnimeBtn"></div>
+      <div class="light minimize"></div>
+      <div class="light maximize"></div>
+    </div>
+    <div class="window-title">Anime</div>
+  </div>
+  <div class="window-body" id="animeBodyContainer">
+    <div class="resize-overlay"></div>
+  </div>
     <div class="settings-title">Tab Anti-Guardian Cloaking</div>
   </div>
   <div class="settings-content">
@@ -974,6 +986,10 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="name">minecraft 1.20.1</div>
       <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Minecraft_Launcher_o5piAG6j6w_lowResPng-13b48d2bd1.png" alt="Weather">
     </li>
+    <li class="li-anime" id="animeDockIcon" data-app="anime">
+  <div class="name">anime</div>
+  <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_v4eN0aUpIn_lowResPng-9917fa42d7.png" alt="Anime">
+</li>
     
     <div class="dock-separator standard-separator" id="dockSepSecond"></div>
 
@@ -994,6 +1010,7 @@ const APPS = {
   safari: { title: "zen Browser", icon: "https://s3-new.macosicons.com/macosicons/parse/Zen_Browser_EgBaGQ64c7_lowResPng-3e6e0432c4.png", pinned: true, id: "safari" },
   calc: { title: "chatgpt ai", icon: "https://s3-new.macosicons.com/macosicons/parse/ChatGPT_Black__FtvwWRjNjF_lowResPng-782b34327b.png", pinned: true, id: "calc" },
   weather: { title: "minecraft 1.20.1", icon: "https://s3-new.macosicons.com/macosicons/parse/Minecraft_Launcher_o5piAG6j6w_lowResPng-13b48d2bd1.png", pinned: true, id: "weather" },
+  anime: { title: "Anime", icon: "https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_v4eN0aUpIn_lowResPng-9917fa42d7.png", pinned: true, id: "anime" }
 };
 
 const secureFrames = {
@@ -1003,7 +1020,8 @@ const secureFrames = {
   music: { url: "https://jorgeasantiago904-design.github.io/music/#/home", containerId: "musicBodyContainer" },
   safari: { url: "https://jorgeasantiago904-design.github.io/browser/", containerId: "safariBodyContainer" },
   calc: { url: "https://jorgeasantiago904-design.github.io/new-sol-ai-v4/", containerId: "calcBodyContainer" },
-  weather: { url: "https://yee.pages.dev/#/bW9yZS9tb3JlL21vZGRlZC9lYWdseWpz", containerId: "weatherBodyContainer" }
+  weather: { url: "https://yee.pages.dev/#/bW9yZS9tb3JlL21vZGRlZC9lYWdseWpz", containerId: "weatherBodyContainer" },
+  anime: { url: "https://hianime.to/", containerId: "animeBodyContainer" }
 };
 
 // Global Z-Index Manager to automatically overlap menus correctly
@@ -1142,6 +1160,7 @@ const closeCloakingBtn = document.getElementById("closeCloakingBtn");
 const sizeSlider = document.getElementById("sizeSlider");
 const loopToggle = document.getElementById("loopToggle");
 const positionSelect = document.getElementById("positionSelect");
+const animeWindow = document.getElementById("animeWindow");
 
 // Window Controllers
 const imessageWindow = document.getElementById("imessageWindow");
@@ -1158,6 +1177,7 @@ const calcWindow = document.getElementById("calcWindow");
 const closeCalcBtn = document.getElementById("closeCalcBtn");
 const weatherWindow = document.getElementById("weatherWindow");
 const closeWeatherBtn = document.getElementById("closeWeatherBtn");
+const closeAnimeBtn = document.getElementById("closeAnimeBtn");
 
 // Wallpaper Engine Variables
 const bgContainer = document.getElementById("bgContainer");
@@ -1441,6 +1461,10 @@ function launchApp(appType) {
     targetWin = settingsWindow;
   } else if (appType === "finder") {
     openFinderMenu();
+    } else if (appType === "anime") {
+  targetWin = animeWindow;
+  setupFrame("anime");
+}
     return;
   }
 
@@ -1472,6 +1496,7 @@ closeMusicBtn.addEventListener("click", () => { musicWindow.classList.remove("op
 closeSafariBtn.addEventListener("click", () => { safariWindow.classList.remove("open"); destroyFrame("safari"); });
 closeCalcBtn.addEventListener("click", () => { calcWindow.classList.remove("open"); destroyFrame("calc"); });
 closeWeatherBtn.addEventListener("click", () => { weatherWindow.classList.remove("open"); destroyFrame("weather"); });
+
 
 // Window Global Mousedown Listener
 document.querySelectorAll('.app-window, .settings-window').forEach(win => {
