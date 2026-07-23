@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameHub</title>
+  <style>
+    :root {
+      --bg-dark: #0a0a0c;
+      --bg-card: #141418;
+      --bg-card-hover: #1c1c22;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-light: rgba(255, 255, 255, 0.2);
+      --text-main: #ffffff;
+      --text-muted: #8e8e9a;
+      --accent-gray: #2e2e36;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #25252b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #40404a;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Dynamic Hover Background Overlay */
+    .bg-hover-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      filter: blur(40px) brightness(0.12) grayscale(0.5);
+      opacity: 0;
+      transition: opacity 0.5s ease, background-image 0.5s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-hover-overlay.active {
+      opacity: 1;
+    }
+
+    /* Header */
+    header {
+      background-color: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 16px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 28px;
+      height: 28px;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: 28px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .tab-btn:hover {
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background-color: #ffffff;
+      color: #000000;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Search Container */
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box {
+      position: relative;
+      width: 250px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box img {
+      position: absolute;
+      left: 14px;
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 9px 18px 9px 38px;
+      border-radius: 20px;
+      border: 1px solid var(--border-subtle);
+      background-color: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      outline: none;
+      font-size: 0.82rem;
+      transition: all 0.25s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--border-light);
+      background-color: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
+    }
+
+    .game-count-badge {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .game-count-badge img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .game-count-badge span {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    main {
+      padding: 36px;
+      flex-grow: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Grid System */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
+      width: 100%;
+    }
+
+    /* Game Card */
+    .game-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background-color: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      isolation: isolate;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-light);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Full Color Thumbnail */
+    .card-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .game-card:hover .card-thumb {
+      transform: scale(1.08);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+
+    .card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80%;
+      background: linear-gradient(to top, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.6) 60%, rgba(10, 10, 12, 0) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .game-card:hover .card-overlay {
+      transform: translateY(0);
+    }
+
+    .card-title {
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      line-height: 1.35;
+      margin-top: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Modal Player Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      display: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .player-container {
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .player-header {
+      padding: 14px 28px;
+      background-color: rgba(14, 14, 18, 0.95);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 10;
+    }
+
+    .game-title-info {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+    }
+
+    .game-title-display {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .game-desc-display {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-secondary { 
+      background-color: rgba(255, 255, 255, 0.08); 
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover { 
+      background-color: rgba(255, 255, 255, 0.15); 
+    }
+
+    .btn-danger { 
+      background-color: #2e2e36; 
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-danger:hover { 
+      background-color: #40404a; 
+    }
+
+    .iframe-wrapper {
+      flex-grow: 1;
+      width: 100vw;
+      height: calc(100vh - 65px);
+      background-color: #000;
+      position: relative;
+    }
+
+    .runner-status {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      z-index: 2;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .runner-status span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .runner-icon {
+      width: 48px;
+      height: 48px;
+    }
+
+    .runner-icon.spinner {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .runner-status.hidden {
+      display: none;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .status-msg {
+      text-align: center;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+      padding: 60px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bgHoverOverlay" class="bg-hover-overlay"></div>
+
+  <header>
+    <div class="header-left">
+      <div class="logo">
+        <img src="https://s3-new.macosicons.com/macosicons/parse/Unity_Hub_AnUb3YN7hI_lowResPng-01396c6e5c.png" alt="GameHub Logo">
+        GameHub
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="all">
+          <img src="https://img.icons8.com/?size=100&id=66773&format=png&color=737373" alt="All"> All Games
+        </button>
+        <button class="tab-btn" data-tab="hydra">
+          <img src="https://github.com/jorgeasantiago904-design/hydra-logo/blob/main/hydra.png?raw=true" alt="Hydra"> Hydra Network
+        </button>
+        <button class="tab-btn" data-tab="noahh">
+          <img src="https://github.com/jorgeasantiago904-design/Noahs-Calculus-Tutor/blob/master/cuh.png?raw=true" alt="Noahh"> Noahh
+        </button>
+        <button class="tab-btn" data-tab="selenite">
+          <img src="https://selenite1.freetls.fastly.net/data/1722049543147626500/b893c7c1-b208-429f-b362-a263003a8630.webp" alt="Selenite"> Selenite
+        </button>
+      </nav>
+    </div>
+    <div class="search-container">
+      <div class="search-box">
+        <img src="https://img.icons8.com/fluency/48/search.png" alt="Search">
+        <input type="text" id="searchInput" placeholder="Search games...">
+      </div>
+      <div class="game-count-badge" id="gameCountBadge">
+        <img src="https://img.icons8.com/fluency/48/arcade.png" alt="Badge">
+        Games: <span id="gameCount">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="gamesGrid" class="games-grid">
+      <div class="status-msg">Loading games library...</div>
+    </div>
+  </main>
+
+  <div id="playerModal" class="modal-overlay">
+    <div class="player-container">
+      <div class="player-header">
+        <div class="game-title-info">
+          <div id="activeGameTitle" class="game-title-display">Playing Game</div>
+          <div id="activeGameDesc" class="game-desc-display"></div>
+        </div>
+        <div class="player-controls">
+          <button id="downloadBtn" class="btn btn-secondary">
+            <img src="https://img.icons8.com/fluency/48/download.png" alt="Download"> Download Source
+          </button>
+          <button id="closeBtn" class="btn btn-danger">
+            <img src="https://img.icons8.com/fluency/48/close-window.png" alt="Close"> Close
+          </button>
+        </div>
+      </div>
+      <div class="iframe-wrapper">
+        <div id="runnerStatus" class="runner-status">
+          <img id="runnerImg" src="https://img.icons8.com/?size=100&amp;id=33889&amp;format=png&amp;color=FFFFFF" class="runner-icon spinner" alt="Status Icon">
+          <span id="statusText">Loading game...</span>
+        </div>
+        <iframe id="gameIframe" allowfullscreen sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-pointer-lock allow-downloads"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FALLBACK_IMG = "https://via.placeholder.com/400x250/141418/ffffff?text=No+Image";
+    const LOADING_ICON = "https://img.icons8.com/?size=100&id=33889&format=png&color=FFFFFF";
+    const ERROR_ICON = "https://img.icons8.com/?size=100&id=6SQJcUEPQTXf&format=png&color=FFFFFF";
+
+    const BASE_CDN_HYDRA = "https://cdn.jsdelivr.net/gh/1234chromebook1234-creator/hh@main/";
+    const GAMES_FOLDER_HYDRA = "gmes/";
+
+    const BASE_CDN_NOAHH = "https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor@master/games/";
+
+    const DATA = {
+      hydra: [],
+      noahh: [],
+      selenite: [],
+      all: []
+    };
+
+    let activeTab = "all";
+    let currentGame = null;
+    let currentRawCode = "";
+
+    function safeArray(obj) {
+      if (!obj) return [];
+      if (Array.isArray(obj)) return obj;
+      return Object.values(obj);
+    }
+
+    function dedupeGames(array) {
+      const seen = new Set();
+      return array.filter(item => {
+        if (!item || !item.name) return false;
+        const key = item.name.toLowerCase().trim();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    // LOAD HYDRA NETWORK SOURCE
+    async function loadHydra() {
+      try {
+        const r = await fetch(BASE_CDN_HYDRA + "gmes.json");
+        if (!r.ok) return;
+        const d = await r.json();
+        let rawArray = safeArray(d);
+        
+        DATA.hydra = dedupeGames(rawArray.map(g => {
+          if (!g || typeof g !== "object") return null;
+
+          let file = g.file_name || g.link || g.url || g.file || g.path || g.html;
+          let title = g.title || g.name || g.game || "Untitled Game";
+
+          if (!file) return null;
+          
+          file = String(file).replace(/^\/+/, "");
+          let rawGameUrl = file.startsWith("http") ? file : (BASE_CDN_HYDRA + (file.startsWith(GAMES_FOLDER_HYDRA) ? file : GAMES_FOLDER_HYDRA + file));
+
+          let thumb = g.thumb || g.image || g.img || g.thumbnail || FALLBACK_IMG;
+          if (thumb !== FALLBACK_IMG && !thumb.startsWith("http")) {
+            thumb = BASE_CDN_HYDRA + thumb.replace(/^\/+/, "");
+          }
+          
+          return { 
+            name: title,
+            description: g.description || g.desc || "",
+            img: thumb,
+            url: rawGameUrl,
+            source: "hydra"
+          };
+        }).filter(Boolean));
+      } catch (e) {
+        console.error("Error loading Hydra games:", e);
+      }
+    }
+
+    // LOAD NOAHH SOURCE
+    async function loadNoahh() {
+      try {
+        const r = await fetch("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor@master/games.js");
+        if (!r.ok) return;
+        const jsText = await r.text();
+        
+        let parsedData = [];
+        try {
+          const cleanJs = jsText.replace(/^(const|let|var)\s+\w+\s*=\s*/, '').replace(/;?\s*$/, '');
+          parsedData = new Function(`return ${cleanJs}`)();
+        } catch (e) {
+          const jsonMatch = jsText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+          if (jsonMatch) {
+            parsedData = JSON.parse(jsonMatch[0]);
+          }
+        }
+
+        const rawArray = safeArray(parsedData);
+        
+        DATA.noahh = dedupeGames(rawArray.map(g => {
+          if (!g) return null;
+          
+          const title = g.title || g.name || g.label;
+          const description = g.description || g.desc || g.summary || "";
+          let rawPath = g.url || g.link || g.path || g.file || "";
+          let rawImg = g.image || g.img || g.thumbnail || g.icon || FALLBACK_IMG;
+
+          if (!title || !rawPath) return null;
+
+          let fileName = String(rawPath)
+            .replace(/^file:\/\/\/?/i, '')
+            .replace(/^.*[\/\\]view=games[\/\\]?/i, '')
+            .replace(/^.*[\/\\]games[\/\\]?/i, '')
+            .replace(/^\/+/, '')
+            .trim();
+
+          if (fileName && !fileName.endsWith('.html') && !fileName.includes('.')) {
+            fileName += '.html';
+          }
+
+          const rawCdnUrl = `${BASE_CDN_NOAHH}${fileName}`;
+
+          if (rawImg !== FALLBACK_IMG && !rawImg.startsWith("http") && !rawImg.startsWith("data:")) {
+            rawImg = `https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor@master/${rawImg.replace(/^\/+/, '')}`;
+          }
+
+          return {
+            name: title,
+            description: description,
+            img: rawImg,
+            url: rawCdnUrl,
+            source: "noahh"
+          };
+        }).filter(Boolean));
+
+      } catch (e) {
+        console.error("Error loading Noahh games:", e);
+      }
+    }
+
+    // LOAD SELENITE SOURCE
+    async function loadSelenite() {
+      try {
+        const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
+        if (!r.ok) return;
+        const d = await r.json();
+        DATA.selenite = dedupeGames(safeArray(d).map(g => {
+          if (!g?.name || !g?.image || !g?.directory) return null;
+          const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
+          return {
+            name: g.name,
+            description: g.description || "",
+            img: "https://math-quests-cc.dk-ubg.workers.dev/resources/semag/" + dir + "/" + g.image,
+            url: "https://selenite.cc/resources/semag/" + dir + "/index.html",
+            source: "selenite"
+          };
+        }).filter(Boolean));
+      } catch (e) {
+        console.error("Error loading Selenite games:", e);
+      }
+    }
+
+    async function initData() {
+      await Promise.all([
+        loadHydra(),
+        loadNoahh(),
+        loadSelenite()
+      ]);
+
+      DATA.all = dedupeGames([
+        ...DATA.hydra, 
+        ...DATA.noahh, 
+        ...DATA.selenite
+      ]);
+      updateTabDisplay();
+    }
+
+    const gamesGrid = document.getElementById('gamesGrid');
+    const searchInput = document.getElementById('searchInput');
+    const gameCountEl = document.getElementById('gameCount');
+    const playerModal = document.getElementById('playerModal');
+    const gameIframe = document.getElementById('gameIframe');
+    const runnerStatus = document.getElementById('runnerStatus');
+    const runnerImg = document.getElementById('runnerImg');
+    const statusText = document.getElementById('statusText');
+    const activeGameTitle = document.getElementById('activeGameTitle');
+    const activeGameDesc = document.getElementById('activeGameDesc');
+    const bgHoverOverlay = document.getElementById('bgHoverOverlay');
+
+    function getActiveList() {
+      if (activeTab === "hydra") return DATA.hydra;
+      if (activeTab === "noahh") return DATA.noahh;
+      if (activeTab === "selenite") return DATA.selenite;
+      return DATA.all;
+    }
+
+    function updateTabDisplay() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const currentList = getActiveList();
+      
+      const filtered = currentList.filter(game => 
+        game.name.toLowerCase().includes(searchTerm) ||
+        (game.description && game.description.toLowerCase().includes(searchTerm))
+      );
+
+      renderGames(filtered);
+    }
+
+    function renderGames(list) {
+      gamesGrid.innerHTML = '';
+      gameCountEl.textContent = list ? list.length : 0;
+
+      if (!list || list.length === 0) {
+        gamesGrid.innerHTML = `<div class="status-msg">No games found.</div>`;
+        return;
+      }
+
+      list.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+
+        card.innerHTML = `
+          <div class="card-badge">${game.source}</div>
+          <img class="card-thumb" src="${game.img}" alt="${game.name}" loading="lazy" onerror="this.onerror=null;this.src='${FALLBACK_IMG}';">
+          <div class="card-overlay">
+            <div class="card-title">${game.name}</div>
+            ${game.description ? `<div class="card-desc">${game.description}</div>` : ''}
+          </div>
+        `;
+
+        card.addEventListener('mouseenter', () => {
+          if (game.img && game.img !== FALLBACK_IMG) {
+            bgHoverOverlay.style.backgroundImage = `url('${game.img}')`;
+            bgHoverOverlay.classList.add('active');
+          }
+        });
+
+        card.addEventListener('mouseleave', () => {
+          bgHoverOverlay.classList.remove('active');
+        });
+
+        card.addEventListener('click', () => runGameCode(game));
+        gamesGrid.appendChild(card);
+      });
+    }
+
+    // CODE RUNNER ENGINE FIX
+    async function runGameCode(game) {
+      currentGame = game;
+      currentRawCode = "";
+      activeGameTitle.textContent = game.name;
+      activeGameDesc.textContent = game.description || "";
+      
+      playerModal.classList.add('active');
+      runnerStatus.classList.remove('hidden');
+
+      // Set Loading state
+      runnerImg.src = LOADING_ICON;
+      runnerImg.classList.add('spinner');
+      statusText.textContent = "Loading game...";
+
+      // Direct iframe framing for proxy-hosted sources like Selenite
+      if (game.source === "selenite") {
+        gameIframe.removeAttribute('srcdoc');
+        gameIframe.src = game.url;
+        setTimeout(() => runnerStatus.classList.add('hidden'), 500);
+        return;
+      }
+
+      try {
+        // Fetch via CDN with proper CORS headers
+        const response = await fetch(game.url);
+        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+        
+        currentRawCode = await response.text();
+
+        statusText.textContent = "Loading game...";
+
+        // Calculate relative base URL so scripts, css, images inside the game bundle load seamlessly
+        let baseHref = "";
+        if (game.url.startsWith("http")) {
+          baseHref = game.url.substring(0, game.url.lastIndexOf('/') + 1);
+        }
+
+        let injectedCode = currentRawCode;
+
+        if (baseHref) {
+          if (/<head[^>]*>/i.test(injectedCode)) {
+            injectedCode = injectedCode.replace(/<head[^>]*>/i, `$&<base href="${baseHref}">`);
+          } else {
+            injectedCode = `<base href="${baseHref}">` + injectedCode;
+          }
+        }
+
+        gameIframe.removeAttribute('src');
+        gameIframe.srcdoc = injectedCode;
+
+        setTimeout(() => {
+          runnerStatus.classList.add('hidden');
+        }, 300);
+
+      } catch (err) {
+        console.warn("Code Runner Fetch Error, executing fallback iframe direct connection:", err);
+        
+        // Switch to Error state icon & message
+        runnerImg.src = ERROR_ICON;
+        runnerImg.classList.remove('spinner');
+        statusText.textContent = "Error detected";
+
+        setTimeout(() => {
+          gameIframe.removeAttribute('srcdoc');
+          gameIframe.src = game.url;
+          runnerStatus.classList.add('hidden');
+        }, 800);
+      }
+    }
+
+    function closeGame() {
+      playerModal.classList.remove('active');
+      gameIframe.srcdoc = '';
+      gameIframe.src = 'about:blank';
+      runnerStatus.classList.add('hidden');
+      currentGame = null;
+      currentRawCode = "";
+    }
+
+    // Navigation Switcher
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        activeTab = e.currentTarget.getAttribute('data-tab');
+        updateTabDisplay();
+      });
+    });
+
+    // Search Filter
+    searchInput.addEventListener('input', updateTabDisplay);
+
+    // Modal Controls
+    document.getElementById('closeBtn').addEventListener('click', closeGame);
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      if (!currentGame) return;
+
+      const content = currentRawCode || `<iframe src="${currentGame.url}" style="width:100vw;height:100vh;border:none;"></iframe>`;
+      const blob = new Blob([content], { type: 'text/html' });
+      const downloadUrl = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `${currentGame.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(downloadUrl);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && playerModal.classList.contains('active')) {
+        closeGame();
+      }
+    });
+
+    initData();
+  </script>
+</body>
+</html>
