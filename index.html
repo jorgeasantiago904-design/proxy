@@ -113,8 +113,6 @@ body.dock-right .day-cycle-bar {
   transform: scale(0.9);
   width: 950px;
   height: 650px;
-  max-width: 100vw;
-  max-height: 100vh;
   min-width: 350px;
   min-height: 250px;
   resize: both;
@@ -224,8 +222,6 @@ body.dock-right .day-cycle-bar {
   transform: translate(-50%, -50%) scale(0.95);
   width: 600px;
   height: 580px;
-  max-width: 100vw;
-  max-height: 100vh;
   background: #000000;
   border: 1px solid #222222;
   border-radius: 16px;
@@ -534,8 +530,6 @@ body.dock-right .dock-separator {
   transform: scale(0.9);
   width: 440px;
   height: 500px;
-  max-width: 100vw;
-  max-height: 100vh;
   min-width: 300px;
   min-height: 250px;
   resize: both;
@@ -728,7 +722,7 @@ input:checked + .slider:before { transform: translateX(20px); }
   <footer class="start-panel-footer">
     <div class="profile-section">
       <div class="profile-avatar"><i class="fas fa-folder" aria-hidden="true"></i></div>
-      <span class="profile-name">app menu</span>
+      <span class="profile-name">Finder Workspace</span>
     </div>
   </footer>
 </aside>
@@ -810,7 +804,7 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">chatgpt ai</div>
+    <div class="window-title">sol ai</div>
   </div>
   <div class="window-body" id="calcBodyContainer">
     <div class="resize-overlay"></div>
@@ -824,27 +818,27 @@ input:checked + .slider:before { transform: translateX(20px); }
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">minecraft 1.20.1</div>
+    <div class="window-title">minecraft launcher</div>
   </div>
   <div class="window-body" id="weatherBodyContainer">
     <div class="resize-overlay"></div>
   </div>
 </div>
-  
-<div id="animeWindow" class="app-window">
+
+<div id="myAppWindow" class="app-window">
   <div class="window-header">
     <div class="traffic-lights">
-      <div class="light close" id="closeAnimeBtn"></div>
+      <div class="light close" id="closeMyAppBtn"></div>
       <div class="light minimize"></div>
       <div class="light maximize"></div>
     </div>
-    <div class="window-title">Anime</div>
+    <div class="window-title">My Custom App</div>
   </div>
-  <div class="window-body" id="animeBodyContainer">
+  <div class="window-body" id="myAppBodyContainer">
     <div class="resize-overlay"></div>
   </div>
 </div>
-  
+
 <div id="cloakingWindow" class="settings-window">
   <div class="settings-header">
     <div class="traffic-lights">
@@ -957,42 +951,41 @@ input:checked + .slider:before { transform: translateX(20px); }
   <div class="dock-container" id="dockContainerList">
     <li class="li-1 system-protected" id="finderDockIcon" data-app="finder">
       <div class="name">app menu</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Windows_11_Virtual_Machine_bcBzAc0aHK_lowResPng-66cdef4d9f.png" alt="Finder">
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Windows_11_Parallels_nB3Q6NkNfC_lowResPng-f113d7ced7.png" alt="Finder">
     </li>
     <div class="dock-separator standard-separator" id="dockSep"></div>
     <li class="li-5" id="notesDockIcon" data-app="notes">
       <div class="name">game hub</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Unity_Hub_AnUb3YN7hI_lowResPng-01396c6e5c.png" alt="Notes">
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Unity_Hub_BqEKtZBrMf_lowResPng-48101a2992.png" alt="Notes">
     </li>
     <li class="li-8" id="imessageDockIcon" data-app="imessage">
-      <div class="name">netflix</div>
-      <img class="ico" src="https://github.com/jorgeasantiago904-design/icons-for-my-unblocker-/blob/main/517805c2-3f4d-431d-839f-ca15da3299a7.png?raw=true" alt="Messages">
+      <div class="name">net-flix</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Netflix_yEiIl5pnRb_lowResPng-64b27d00df.png" alt="Messages">
     </li>
     <li class="li-y" id="sontubeDockIcon" data-app="sontube">
       <div class="name">youtube</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/YouTube__uniform_gray__9ybfHR4PPH_lowResPng-69278f7332.png" alt="sontube">
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Youtube_Zn2CyUOnOT_lowResPng-d7f85aea0d.png" alt="sontube">
     </li>
     <li class="li-10" id="musicDockIcon" data-app="music">
-      <div class="name">spotify</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Spotify_wX0fAj8fPa_lowResPng-893a50bef4.png" alt="Music">
-    </li>
-    <li class="li-14" id="safariDockIcon" data-app="safari">
-      <div class="name">zen brower</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Zen_Browser_EgBaGQ64c7_lowResPng-3e6e0432c4.png" alt="Safari">
+      <div class="name">Music</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Spotify__iOS-like__green_and_black__ingGF6FV9D_lowResPng-f820159870.png" alt="Music">
     </li>
     <li class="li-calc" id="calcDockIcon" data-app="calc">
-      <div class="name">chatgpt ai</div>
+      <div class="name">chatgpt</div>
       <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/ChatGPT_Black__FtvwWRjNjF_lowResPng-782b34327b.png" alt="Calculator">
     </li>
     <li class="li-weather" id="weatherDockIcon" data-app="weather">
-      <div class="name">minecraft 1.20.1</div>
-      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Minecraft_Launcher_o5piAG6j6w_lowResPng-13b48d2bd1.png" alt="Weather">
+      <div class="name">minecraft</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Minecraft_8x8_LZvrRL2EGt_lowResPng-24c81c2dbf.png" alt="Weather">
     </li>
- <li class="li-anime" id="animeDockIcon" data-app="anime">
-  <div class="name">anime</div>
-  <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_v4eN0aUpIn_lowResPng-9917fa42d7.png" alt="Anime">
-</li>
+    
+    <li id="myAppDockIcon" data-app="myApp">
+      <div class="name">anime</div>
+      <img class="ico" src="https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_5Knn05i5t6_lowResPng-24d7aef2b3.png" alt="My Custom App">
+    </li>
+
     <div class="dock-separator standard-separator" id="dockSepSecond"></div>
+
     <li class="li-bin li-15 system-protected" id="binDockIcon" data-app="bin">
       <div class="name">settings</div>
       <img class="ico ico-bin" src="https://github.com/jorgeasantiago904-design/icons-for-my-unblocker-/blob/main/8c7cc485-1780-490f-a527-c1b62bb6672b.png?raw=true" alt="Trash Bin">
@@ -1003,28 +996,28 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 // --- Configurable Web Application Repositories ---
 const APPS = {
-  notes: { title: "Game Hub", icon: "https://s3-new.macosicons.com/macosicons/parse/Unity_Hub_AnUb3YN7hI_lowResPng-01396c6e5c.png ", pinned: true, id: "notes" },
-  imessage: { title: "netflix", icon: "https://github.com/jorgeasantiago904-design/icons-for-my-unblocker-/blob/main/517805c2-3f4d-431d-839f-ca15da3299a7.png?raw=true", pinned: true, id: "imessage" },
-  sontube: { title: "YouTube", icon: "https://s3-new.macosicons.com/macosicons/parse/YouTube__uniform_gray__9ybfHR4PPH_lowResPng-69278f7332.png", pinned: true, id: "sontube" },
-  music: { title: "spotify", icon: "https://s3-new.macosicons.com/macosicons/parse/Spotify_wX0fAj8fPa_lowResPng-893a50bef4.png", pinned: true, id: "music" },
-  safari: { title: "zen Browser", icon: "https://s3-new.macosicons.com/macosicons/parse/Zen_Browser_EgBaGQ64c7_lowResPng-3e6e0432c4.png", pinned: true, id: "safari" },
-  calc: { title: "chatgpt ai", icon: "https://s3-new.macosicons.com/macosicons/parse/ChatGPT_Black__FtvwWRjNjF_lowResPng-782b34327b.png", pinned: true, id: "calc" },
-  weather: { title: "minecraft 1.20.1", icon: "https://s3-new.macosicons.com/macosicons/parse/Minecraft_Launcher_o5piAG6j6w_lowResPng-13b48d2bd1.png", pinned: true, id: "weather" },
-  anime: { title: "Anime", icon: "https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_v4eN0aUpIn_lowResPng-9917fa42d7.png", pinned: true, id: "anime" }
+  notes: { title: "Game Hub", icon: "https://s3-new.macosicons.com/macosicons/parse/Unity_Hub_BqEKtZBrMf_lowResPng-48101a2992.png", pinned: true, id: "notes" },
+  imessage: { title: "net-flix", icon: "https://s3-new.macosicons.com/macosicons/parse/Netflix_yEiIl5pnRb_lowResPng-64b27d00df.png", pinned: true, id: "imessage" },
+  sontube: { title: "YouTube", icon: "https://s3-new.macosicons.com/macosicons/parse/Youtube_Zn2CyUOnOT_lowResPng-d7f85aea0d.png", pinned: true, id: "sontube" },
+  music: { title: "Music", icon: "https://s3-new.macosicons.com/macosicons/parse/Spotify__iOS-like__green_and_black__ingGF6FV9D_lowResPng-f820159870.png", pinned: true, id: "music" },
+  safari: { title: "Browser", icon: "https://vorssaint.com/app-icon.png", pinned: true, id: "safari" },
+  calc: { title: "chatgpt", icon: "https://s3-new.macosicons.com/macosicons/parse/ChatGPT_Black__FtvwWRjNjF_lowResPng-782b34327b.png", pinned: true, id: "calc" },
+  weather: { title: "minecraft", icon: "https://s3-new.macosicons.com/macosicons/parse/Minecraft_8x8_LZvrRL2EGt_lowResPng-24c81c2dbf.png", pinned: true, id: "weather" },
+  myApp: { title: "anime", icon: "https://s3-new.macosicons.com/macosicons/parse/Crunchyroll_5Knn05i5t6_lowResPng-24d7aef2b3.png", pinned: true, id: "myApp" }
 };
 
 const secureFrames = {
   imessage: { url: "https://jorgeasantiago904-design.github.io/sonflix/", containerId: "imessageBodyContainer" },
   sontube: { url: "https://cdn.jsdelivr.net/gh/jorgeasantiago904-design/YouTube-reminx@main/index%20(75).html", containerId: "sontubeBodyContainer", fetchCode: true },
-  notes: { url: "APP/GAME HUB.HTML", containerId: "gamehubBodyContainer" }, 
+  notes: { url: "APP/GAMES HUB.HTML", containerId: "gamehubBodyContainer" }, 
   music: { url: "https://jorgeasantiago904-design.github.io/music/#/home", containerId: "musicBodyContainer" },
   safari: { url: "https://jorgeasantiago904-design.github.io/browser/", containerId: "safariBodyContainer" },
-  calc: { url: "https://jorgeasantiago904-design.github.io/new-sol-ai-v4/", containerId: "calcBodyContainer" },
+  calc: { url: "https://www.desmos.com/scientific", containerId: "calcBodyContainer" },
   weather: { url: "https://yee.pages.dev/#/bW9yZS9tb3JlL21vZGRlZC9lYWdseWpz", containerId: "weatherBodyContainer" },
-  anime: { url: "https://hianime.to/", containerId: "animeBodyContainer" }
+  myApp: { url: "https://en.wikipedia.org", containerId: "myAppBodyContainer" }
 };
 
-// Global Z-Index Manager to automatically overlap menus correctly
+// Global Z-Index Manager
 let highestZIndex = 10000;
 
 function bringWindowToFront(win) {
@@ -1118,7 +1111,6 @@ function setupFrame(appKey) {
   const container = document.getElementById(config.containerId);
   if (!container) return;
   
-  // If iframe is already running, don't recreate it
   if (container.querySelector("iframe")) return;
 
   const frame = document.createElement("iframe");
@@ -1144,8 +1136,8 @@ function destroyFrame(appKey) {
   
   const frame = container.querySelector("iframe");
   if (frame) {
-    frame.src = "about:blank"; // Force audio/video to immediately stop playing
-    frame.remove();            // Remove element completely from DOM
+    frame.src = "about:blank"; 
+    frame.remove();            
   }
 }
 
@@ -1160,7 +1152,6 @@ const closeCloakingBtn = document.getElementById("closeCloakingBtn");
 const sizeSlider = document.getElementById("sizeSlider");
 const loopToggle = document.getElementById("loopToggle");
 const positionSelect = document.getElementById("positionSelect");
-const animeWindow = document.getElementById("animeWindow");
 
 // Window Controllers
 const imessageWindow = document.getElementById("imessageWindow");
@@ -1177,7 +1168,10 @@ const calcWindow = document.getElementById("calcWindow");
 const closeCalcBtn = document.getElementById("closeCalcBtn");
 const weatherWindow = document.getElementById("weatherWindow");
 const closeWeatherBtn = document.getElementById("closeWeatherBtn");
-const closeAnimeBtn = document.getElementById("closeAnimeBtn");
+
+// Custom App Variables
+const myAppWindow = document.getElementById("myAppWindow");
+const closeMyAppBtn = document.getElementById("closeMyAppBtn");
 
 // Wallpaper Engine Variables
 const bgContainer = document.getElementById("bgContainer");
@@ -1287,19 +1281,8 @@ function onMouseDown(e) {
       dragOffset.y = e.clientY - rect.top;
       
       activeDraggedItem.classList.add("dragging");
-      
-      let initialLeft = rect.left;
-      let initialTop = rect.top;
-      const w = activeDraggedItem.offsetWidth || 75;
-      const h = activeDraggedItem.offsetHeight || 75;
-
-      if (initialLeft < 0) initialLeft = 0;
-      if (initialTop < 0) initialTop = 0;
-      if (initialLeft > window.innerWidth - w) initialLeft = Math.max(0, window.innerWidth - w);
-      if (initialTop > window.innerHeight - h) initialTop = Math.max(0, window.innerHeight - h);
-
-      activeDraggedItem.style.left = `${initialLeft}px`;
-      activeDraggedItem.style.top = `${initialTop}px`;
+      activeDraggedItem.style.left = `${rect.left}px`;
+      activeDraggedItem.style.top = `${rect.top}px`;
       
       document.addEventListener("mousemove", onMouseMove);
     }, 400);
@@ -1310,19 +1293,8 @@ function onMouseDown(e) {
 
 function onMouseMove(e) {
   if (!activeDraggedItem || !dragTriggered) return;
-  let newLeft = e.clientX - dragOffset.x;
-  let newTop = e.clientY - dragOffset.y;
-  
-  const itemWidth = activeDraggedItem.offsetWidth || 75;
-  const itemHeight = activeDraggedItem.offsetHeight || 75;
-
-  if (newLeft < 0) newLeft = 0;
-  if (newTop < 0) newTop = 0;
-  if (newLeft > window.innerWidth - itemWidth) newLeft = Math.max(0, window.innerWidth - itemWidth);
-  if (newTop > window.innerHeight - itemHeight) newTop = Math.max(0, window.innerHeight - itemHeight);
-
-  activeDraggedItem.style.left = `${newLeft}px`;
-  activeDraggedItem.style.top = `${newTop}px`;
+  activeDraggedItem.style.left = `${e.clientX - dragOffset.x}px`;
+  activeDraggedItem.style.top = `${e.clientY - dragOffset.y}px`;
 }
 
 function onMouseUp(e) {
@@ -1379,11 +1351,8 @@ function onMouseUp(e) {
     const gridX = Math.round((e.clientX - dragOffset.x) / 85) * 85;
     const gridY = Math.round((e.clientY - dragOffset.y) / 85) * 85;
     
-    const iconWidth = activeDraggedItem.offsetWidth || 75;
-    const iconHeight = activeDraggedItem.offsetHeight || 75;
-
-    activeDraggedItem.style.left = `${Math.max(0, Math.min(window.innerWidth - iconWidth, gridX))}px`;
-    activeDraggedItem.style.top = `${Math.max(0, Math.min(window.innerHeight - iconHeight, gridY))}px`;
+    activeDraggedItem.style.left = `${Math.max(20, Math.min(window.innerWidth - 90, gridX))}px`;
+    activeDraggedItem.style.top = `${Math.max(50, Math.min(window.innerHeight - 120, gridY))}px`;
   }
   
   activeDraggedItem = null;
@@ -1457,38 +1426,23 @@ function launchApp(appType) {
   } else if (appType === "weather") {
     targetWin = weatherWindow;
     setupFrame("weather");
+  } else if (appType === "myApp") {
+    targetWin = myAppWindow;
+    setupFrame("myApp");
   } else if (appType === "bin") {
     targetWin = settingsWindow;
   } else if (appType === "finder") {
     openFinderMenu();
-    } else if (appType === "anime") {
-  targetWin = animeWindow;
-  setupFrame("anime");
-}
     return;
   }
 
   if (targetWin) {
     targetWin.classList.add("open");
     bringWindowToFront(targetWin);
-    
-    // Contain window position inside screen bounds on initial open
-    const winWidth = targetWin.offsetWidth || 950;
-    const winHeight = targetWin.offsetHeight || 650;
-    let currLeft = targetWin.offsetLeft;
-    let currTop = targetWin.offsetTop;
-
-    if (currLeft < 0) currLeft = 0;
-    if (currTop < 0) currTop = 0;
-    if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
-    if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
-
-    targetWin.style.left = `${currLeft}px`;
-    targetWin.style.top = `${currTop}px`;
   }
 }
 
-// Red Close Button Listeners (Destroys the inner iframe/website completely on click)
+// Red Close Button Listeners (Destroys inner iframe/website completely on click)
 closeImessageBtn.addEventListener("click", () => { imessageWindow.classList.remove("open"); destroyFrame("imessage"); });
 closeSontubeBtn.addEventListener("click", () => { sontubeWindow.classList.remove("open"); destroyFrame("sontube"); });
 closeGamehubBtn.addEventListener("click", () => { gamehubWindow.classList.remove("open"); destroyFrame("notes"); });
@@ -1496,7 +1450,8 @@ closeMusicBtn.addEventListener("click", () => { musicWindow.classList.remove("op
 closeSafariBtn.addEventListener("click", () => { safariWindow.classList.remove("open"); destroyFrame("safari"); });
 closeCalcBtn.addEventListener("click", () => { calcWindow.classList.remove("open"); destroyFrame("calc"); });
 closeWeatherBtn.addEventListener("click", () => { weatherWindow.classList.remove("open"); destroyFrame("weather"); });
-closeAnimeBtn.addEventListener("click", () => { animeWindow.classList.remove("open");  destroyFrame("anime"); });
+closeMyAppBtn.addEventListener("click", () => { myAppWindow.classList.remove("open"); destroyFrame("myApp"); });
+
 // Window Global Mousedown Listener
 document.querySelectorAll('.app-window, .settings-window').forEach(win => {
   win.addEventListener('mousedown', (e) => {
@@ -1509,13 +1464,6 @@ document.querySelectorAll('.app-window, .settings-window').forEach(win => {
 
       const stopResize = () => {
          if(overlay) overlay.style.display = 'none';
-         
-         // Clamp dimensions after resize
-         const maxW = window.innerWidth - win.offsetLeft;
-         const maxH = window.innerHeight - win.offsetTop;
-         if (win.offsetWidth > maxW && maxW > 0) win.style.width = `${maxW}px`;
-         if (win.offsetHeight > maxH && maxH > 0) win.style.height = `${maxH}px`;
-
          document.removeEventListener('mouseup', stopResize);
       };
       document.addEventListener('mouseup', stopResize);
@@ -1557,18 +1505,11 @@ document.querySelectorAll('.window-header').forEach(header => {
       let newLeft = winLeft + (ev.clientX - startX);
       let newTop = winTop + (ev.clientY - startY);
       
-      const winWidth = win.offsetWidth;
-      const winHeight = win.offsetHeight;
-
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
       
-      if (newLeft > window.innerWidth - winWidth) {
-        newLeft = Math.max(0, window.innerWidth - winWidth);
-      }
-      if (newTop > window.innerHeight - winHeight) {
-        newTop = Math.max(0, window.innerHeight - winHeight);
-      }
+      if (newLeft > window.innerWidth - 60) newLeft = window.innerWidth - 60;
+      if (newTop > window.innerHeight - 60) newTop = window.innerHeight - 60;
 
       win.style.left = `${newLeft}px`;
       win.style.top = `${newTop}px`;
@@ -1598,15 +1539,8 @@ document.querySelectorAll(".position-trigger").forEach(btn => {
 document.addEventListener("contextmenu", (e) => {
   e.preventDefault(); menu.style.display = "block";
   let x = e.clientX; let y = e.clientY;
-  
-  const menuWidth = menu.offsetWidth || 190;
-  const menuHeight = menu.offsetHeight || 150;
-
-  if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth;
-  if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight;
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
-
+  if (x + menu.offsetWidth > window.innerWidth) x = window.innerWidth - menu.offsetWidth - 10;
+  if (y + menu.offsetHeight > window.innerHeight) y = window.innerHeight - menu.offsetHeight - 10;
   menu.style.left = `${x}px`; menu.style.top = `${y}px`;
 });
 document.addEventListener("click", () => { menu.style.display = "none"; });
@@ -1615,38 +1549,11 @@ openSettingsBtn.addEventListener("click", (e) => {
   e.stopPropagation(); 
   settingsWindow.classList.add("open"); 
   bringWindowToFront(settingsWindow);
-  
-  const winWidth = settingsWindow.offsetWidth || 440;
-  const winHeight = settingsWindow.offsetHeight || 500;
-  let currLeft = settingsWindow.offsetLeft;
-  let currTop = settingsWindow.offsetTop;
-
-  if (currLeft < 0) currLeft = 0;
-  if (currTop < 0) currTop = 0;
-  if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
-  if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
-
-  settingsWindow.style.left = `${currLeft}px`;
-  settingsWindow.style.top = `${currTop}px`;
 });
-
 openCloakingBtnMenu.addEventListener("click", (e) => { 
   e.stopPropagation(); 
   cloakingWindow.classList.add("open"); 
   bringWindowToFront(cloakingWindow);
-
-  const winWidth = cloakingWindow.offsetWidth || 440;
-  const winHeight = cloakingWindow.offsetHeight || 500;
-  let currLeft = cloakingWindow.offsetLeft;
-  let currTop = cloakingWindow.offsetTop;
-
-  if (currLeft < 0) currLeft = 0;
-  if (currTop < 0) currTop = 0;
-  if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
-  if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
-
-  cloakingWindow.style.left = `${currLeft}px`;
-  cloakingWindow.style.top = `${currTop}px`;
 });
 
 closeSettingsBtn.addEventListener("click", () => { settingsWindow.classList.remove("open"); });
@@ -1827,7 +1734,7 @@ function initDayCycleClock() {
   }, 1000);
 }
 
-// Global Preferences Initializer
+// Global Preferences Initializer Recovery Hook
 function loadSavedPreferences() {
   const savedPosition = localStorage.getItem('premium_dock_position') || 'bottom';
   updateDockPosition(savedPosition);
@@ -1851,25 +1758,6 @@ function loadSavedPreferences() {
     bgVideo.loop = isTrue;
   }
 }
-
-// Ensure all open windows stay inside screen on window resize
-window.addEventListener('resize', () => {
-  document.querySelectorAll('.app-window.open, .settings-window.open').forEach(win => {
-    if (win.classList.contains('maximized')) return;
-    const winWidth = win.offsetWidth;
-    const winHeight = win.offsetHeight;
-    let currLeft = win.offsetLeft;
-    let currTop = win.offsetTop;
-
-    if (currLeft < 0) currLeft = 0;
-    if (currTop < 0) currTop = 0;
-    if (currLeft > window.innerWidth - winWidth) currLeft = Math.max(0, window.innerWidth - winWidth);
-    if (currTop > window.innerHeight - winHeight) currTop = Math.max(0, window.innerHeight - winHeight);
-
-    win.style.left = `${currLeft}px`;
-    win.style.top = `${currTop}px`;
-  });
-});
 
 // Application Startup hooks
 loadSavedPreferences();
