@@ -1496,8 +1496,7 @@ closeMusicBtn.addEventListener("click", () => { musicWindow.classList.remove("op
 closeSafariBtn.addEventListener("click", () => { safariWindow.classList.remove("open"); destroyFrame("safari"); });
 closeCalcBtn.addEventListener("click", () => { calcWindow.classList.remove("open"); destroyFrame("calc"); });
 closeWeatherBtn.addEventListener("click", () => { weatherWindow.classList.remove("open"); destroyFrame("weather"); });
-
-
+closeAnimeBtn.addEventListener("click", () => { animeWindow.classList.remove("open");  destroyFrame("anime"); });
 // Window Global Mousedown Listener
 document.querySelectorAll('.app-window, .settings-window').forEach(win => {
   win.addEventListener('mousedown', (e) => {
